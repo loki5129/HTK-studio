@@ -31,7 +31,24 @@ function nextpiece(){
         col: col         // current col
   };
 }
+function canmove(matrix, cellRow, cellCol) {
+  for (let row = 0; row < matrix.length; row++) {
+    for (let col = 0; col < matrix[row].length; col++) {
+      if (matrix[row][col] && (
+          // outside the game bounds
+          cellCol + col < 0 ||
+          cellCol + col >= playfield[0].length ||
+          cellRow + row >= playfield.length ||
+          // collides with another piece
+          playfield[cellRow + row][cellCol + col])
+        ) {
+        return false;
+      }
+    }
+  }
 
+  return true;
+}
 
 const tetrominos = {
   'I': [
@@ -123,7 +140,7 @@ const context = canvas.getContext('2d');
 const grid = 32;
 const tseq = [];
 const playfield = [];
-
+let gameover=false;
 let rf = null;  // keep track of the animation frame so we can cancel it
 
 
@@ -136,7 +153,7 @@ for (let row = -2; row < 20; row++) {
 }
 let tetromino = nextpiece();
 function gameloop(){
-    rf = requestAnimationFrame(loop);
+    rf = requestAnimationFrame(gameloop);
   context.clearRect(0,0,canvas.width,canvas.height);
 
   // draw the playfield
@@ -149,17 +166,46 @@ function gameloop(){
   if (tetromino){
     if (++count > 35){
       tetromino.row++
-      count=0
+      count=0;
+       if (!canmove(tetromino.matrix, tetromino.row, tetromino.col)) {
+        tetromino.row--;
+        place();
+      }
+    }
+    context.fillStyle = colors[tetromino.name];
+
+    for (let row = 0; row < tetromino.matrix.length; row++) {
+      for (let col = 0; col < tetromino.matrix[row].length; col++) {
+        if (tetromino.matrix[row][col]) {
+
+          // drawing 1 px smaller than the grid creates a grid effect
+          context.fillRect((tetromino.col + col) * grid, (tetromino.row + row) * grid, grid-1, grid-1);
+        }}}}
+      }
+      document.addEventListener('keydown', function(e) {
+       if (gameover) return;
+
+  // left and right arrow keys (move)
+  if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+    const col = e.key === "ArrowLeft"
+      ? tetromino.col - 1
+      : tetromino.col + 1;
+
+    if (canmove(tetromino.matrix, tetromino.row, col)) {
+      tetromino.col = col;
+    }
+  }
+  if(e.key === "ArrowDown") {
+    const row = tetromino.row + 1;
+
+    if (!canmove(tetromino.matrix, row, tetromino.col)) {
+      tetromino.row = row - 1;
+
+      place();
+      return;
     }
 
-
+    tetromino.row = row;
   }
-
-
-
-
-
-  }
-
-
-
+});
+    rAF = requestAnimationFrame(gameloop);  
