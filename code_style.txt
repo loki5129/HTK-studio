@@ -1,0 +1,23 @@
+example function 
+				JAVASCRIPT
+funtction example(){
+	while (i){
+	console.log("hello");
+	}
+}
+
+open curly brackets on the same line and close only one on each new line
+also please put commnets above a block of code explaining what it does and a empty line comment when the block ends
+
+
+/*
+this code checks the users id and password to ensure they log in
+*/
+
+
+if user in users and password[user] == enteredpassword
+//
+				HTML
+dont be funky with the code spacing
+
+
