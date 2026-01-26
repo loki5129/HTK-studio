@@ -117,7 +117,13 @@ const colors = {
 
 //
 
+function drop(matrix,tetrimono){
+	while(canmove(matrix,tetrimono.row +1,tetrimono.col)){
+		tetrimono.row ++;
+	}
+	return;
 
+}
 
 
 
@@ -262,6 +268,9 @@ document.addEventListener('keydown', function(e) {
 	if (canmove(matrix,tetromino.row,tetromino.col)){
 		tetromino.matrix = matrix;
 		}
+	}
+  if (e.key === " "){
+	drop(tetromino.matrix,tetromino);	
 	}
   if(e.key === "ArrowDown") {
     const row = tetromino.row + 1;
