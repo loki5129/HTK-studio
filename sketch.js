@@ -1,3 +1,4 @@
+//this fucntion generates a random int between the parameters 
 
 function randint(min, max) {
   min = Math.ceil(min);
@@ -5,6 +6,9 @@ function randint(min, max) {
 
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+//
+
+// this code generates a sequneunne of the peices 
 function genS(){
     const seq =  ['I', 'J', 'L', 'O', 'S', 'T', 'Z'];
      while (seq.length) {
@@ -13,6 +17,11 @@ function genS(){
     tseq.push(name);
   }
 }
+//
+
+
+
+//this function gets the next piece from the sequnce and makes it into the proper martix so it be used
 function nextpiece(){
     if (tseq.length ==0){
         genS();
@@ -31,6 +40,9 @@ function nextpiece(){
         col: col         // current col
   };
 }
+//
+
+//checks if the piece is not obcute
 function canmove(matrix, cellRow, cellCol) {
   for (let row = 0; row < matrix.length; row++) {
     for (let col = 0; col < matrix[row].length; col++) {
@@ -49,7 +61,10 @@ function canmove(matrix, cellRow, cellCol) {
 
   return true;
 }
+//
 
+
+// shapes
 const tetrominos = {
   'I': [
     [0,0,0,0],
@@ -87,6 +102,9 @@ const tetrominos = {
     [0,0,0],
   ]
 };
+//
+
+//colours for shapes
 const colors = {
   'I': 'cyan',
   'O': 'yellow',
@@ -97,7 +115,7 @@ const colors = {
   'L': 'orange'
 };
 
-
+//
 
 
 
