@@ -1,5 +1,23 @@
 //this fucntion generates a random int between the parameters 
 
+function drawCheck(){
+    
+    context.beginPath();
+    for (var x = 0; x <= bw; x += 32) {
+        context.moveTo(0.5 + x,0);
+        context.lineTo(0.5 + x , bh );
+    }
+
+    for (var x = 0; x <= bh; x += 32) {
+        context.moveTo(0, 0.5 + x );
+        context.lineTo(bw , 0.5 + x);
+    }
+    context.strokeStyle = "black";
+    context.lineWidth = 1;
+    context.stroke();
+}
+
+
 function randint(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -174,7 +192,7 @@ playfield[tetromino.row + row][tetromino.col + col] = tetromino.name;
 		playfield[r][c]=playfield[r-1][c];
 	    }
      	   }
-          }
+          score +=100}
 	  else{
 	  row--;
 	  }
@@ -192,10 +210,14 @@ playfield[tetromino.row + row][tetromino.col + col] = tetromino.name;
 let count =0
 const canvas = document.getElementById('game');
 const context = canvas.getContext('2d');
+var bw = canvas.width;
+var bh = canvas.height;
+
 const grid = 32;
 const tseq = [];
 const playfield = [];
 let gameover=false;
+let score = 0;
 let rf = null;  // keep track of the animation frame so we can cancel it
 function rotate(matrix) {
 	const N = matrix.length - 1;
@@ -213,10 +235,11 @@ for (let row = -2; row < 20; row++) {
 }
 let tetromino = nextpiece();
 function gameloop(){
-    console.log("frame");
-
+    console.log(score);
+    
     rf = requestAnimationFrame(gameloop);
   context.clearRect(0,0,canvas.width,canvas.height);
+  drawCheck();
 
   // draw the playfield
   for (let row = 0; row < 20; row++) {
