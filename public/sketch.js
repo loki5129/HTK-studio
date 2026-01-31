@@ -181,20 +181,24 @@ function place(){
           return showGameOver();
         }
 playfield[tetromino.row + row][tetromino.col + col] = tetromino.name;
-      }
+     sendPlayfield(playfield);
+			}
     }
   }
   for (let row=playfield.length-1; row >=0;){
 	if (playfield[row].every((cell) => !!cell)) {
+	sendPlayfield(playfield);
 	for (let r = row; r>=0; r--){
 	    for (let c =0; c<playfield[r].length; c++){
 		playfield[r][c]=playfield[r-1][c];
 	    }
      	   }
           score +=100;
-	  sendPlayfield(playfield);}
+	  sendPlayfield(playfield)
+	  }
 	  else{
 	  row--;
+	  sendPlayfield(playfield)
 	  }
 	 }
 	tetromino = nextpiece();
@@ -241,8 +245,9 @@ async function sendPlayfield(play){
    	 headers: { "Content-Type": "application/json" },
     	body: JSON.stringify(play)
   });
-  const analysis = await res.json();
-  console.log("AI says:", analysis);
+  //const analysis = await res.json();
+  const text = await res.text();
+  console.log("AI says:", text);
 }
 
 
