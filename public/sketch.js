@@ -137,6 +137,7 @@ const colors = {
 function drop(matrix,tetrimono){
 	while(canmove(matrix,tetrimono.row +1,tetrimono.col)){
 		tetrimono.row ++;
+		
 	}
 	return;
 
@@ -181,27 +182,28 @@ function place(){
           return showGameOver();
         }
 playfield[tetromino.row + row][tetromino.col + col] = tetromino.name;
-     sendPlayfield(playfield);
+   sendPlayfield(playfield, tetromino.matrix);
 			}
     }
   }
   for (let row=playfield.length-1; row >=0;){
 	if (playfield[row].every((cell) => !!cell)) {
-	sendPlayfield(playfield);
-	for (let r = row; r>=0; r--){
+	sendPlayfield(playfield,tetromino.matrix);
+	for (let r = row; r>=0; r--){sendPlayfield(playfield,tetromino.martix)
 	    for (let c =0; c<playfield[r].length; c++){
 		playfield[r][c]=playfield[r-1][c];
 	    }
      	   }
           score +=100;
-	  sendPlayfield(playfield)
+	  sendPlayfield(playfield,tetromino.matrix)
 	  }
 	  else{
 	  row--;
-	  sendPlayfield(playfield)
+	 
 	  }
 	 }
 	tetromino = nextpiece();
+
 }
 
 
@@ -239,14 +241,14 @@ for (let row = -2; row < 20; row++) {
 }
 let tetromino = nextpiece();
 
-async function sendPlayfield(play){
-	 const res = await fetch("/analyze", {
+async function sendPlayfield(play,piece){
+	const res = await fetch("/analyze", {
     	method: "POST",
    	 headers: { "Content-Type": "application/json" },
-    	body: JSON.stringify(play)
-  });
+    	body: JSON.stringify({
+			playfield: play, piece: piece})});
   //const analysis = await res.json();
-  const text = await res.text();
+    const text = await res.json();
   console.log("AI says:", text);
 }
 

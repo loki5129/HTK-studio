@@ -1,5 +1,6 @@
 import express from "express"
 import {mathness} from "./math.js"
+import {allPos} from "./pos.js"
 const app = express();
 
 app.use((req, res, next) => {
@@ -9,17 +10,21 @@ app.use((req, res, next) => {
   );
   next();
 });
+
 app.use(express.static("public"));
 app.use(express.json());
 
 app.post("/analyze", (req, res) => {
-  const playfield = req.body;   
-  let nums = mathness(playfield);  
+ console.log("BODY:", req.body);
+ const {playfield, piece} = req.body;
+ // console.log(playfield);
+  console.log(piece);
+  let nums = mathness(playfield); 
+  //let pos = allPos(piece)
   res.json({nums});
- 
+
 
 });
-
 app.listen(3000, () => {
   console.log("Server running on http://localhost:3000");
 });
