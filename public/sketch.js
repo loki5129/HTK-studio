@@ -182,20 +182,20 @@ function place(){
           return showGameOver();
         }
 playfield[tetromino.row + row][tetromino.col + col] = tetromino.name;
-   sendPlayfield(playfield, tetromino.matrix);
+   sendPlayfield(playfield, tetromino);
 			}
     }
   }
   for (let row=playfield.length-1; row >=0;){
 	if (playfield[row].every((cell) => !!cell)) {
-	sendPlayfield(playfield,tetromino.matrix);
+	sendPlayfield(playfield,tetromino);
 	for (let r = row; r>=0; r--){sendPlayfield(playfield,tetromino.martix)
 	    for (let c =0; c<playfield[r].length; c++){
 		playfield[r][c]=playfield[r-1][c];
 	    }
      	   }
           score +=100;
-	  sendPlayfield(playfield,tetromino.matrix)
+	  sendPlayfield(playfield,tetromino)
 	  }
 	  else{
 	  row--;

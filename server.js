@@ -15,12 +15,14 @@ app.use(express.static("public"));
 app.use(express.json());
 
 app.post("/analyze", (req, res) => {
- console.log("BODY:", req.body);
+ //console.log("BODY:", req.body);
  const {playfield, piece} = req.body;
  // console.log(playfield);
-  console.log(piece);
-  let nums = mathness(playfield); 
-  //let pos = allPos(piece)
+ //console.log(piece);
+ let nums = mathness(playfield);  
+ let pos = allPos(piece,playfield)
+  //console.log(typeof(piece))
+  //console.log(piece.length)
   res.json({nums});
 
 
