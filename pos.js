@@ -14,8 +14,9 @@ for (let i = 1; i < 4; i++) {
     const newRotation = rotate(rotations[i-1]);
     // Only keep unique rotations
  if (!rotations.some(r => JSON.stringify(r) === JSON.stringify(newRotation))) {
-        rotations.push(newRotation);}}
+rotations.push(newRotation);}}
 return rotations;}
+
 function canmove(matrix, cellRow, cellCol) {
   for (let row = 0; row < matrix.length; row++) {
     for (let col = 0; col < matrix[row].length; col++) {
@@ -46,7 +47,7 @@ export function allPos(pie,play) {
 	let matrix = pie.matrix
 //	console.log(pie + "\n");
 	//console.log(rotate(pie))
-	let rotation = rotations(pie);
+	let rotation = rotations(matrix);
 //console.log(rotation)
 	for ( let r in rotation){
 	
