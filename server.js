@@ -16,7 +16,8 @@ app.use(express.json());
 
 app.post("/analyze", (req, res) => {
  //console.log("BODY:", req.body);
- const {playfield, piece} = req.body;
+ const playfield = req.body.playfield;
+ const piece = req.body.piece;
  // console.log(playfield);
  //console.log(piece);
  let nums = mathness(playfield);  
