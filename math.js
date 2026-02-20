@@ -14,6 +14,25 @@ function getHeights(play){
     }
 return heights
 }
+function getLandingHeight(pie, boardHeight = 20) {
+  let bottom = -Infinity;
+
+  for (let row = 0; row < pie.matrix.length; row++) {
+    for (let col = 0; col < pie.matrix[row].length; col++) {
+
+      if (pie.matrix[row][col]) {
+
+        let absoluteRow = pie.row + row;
+
+        if (absoluteRow > bottom) {
+          bottom = absoluteRow;
+        }
+      }
+    }
+  }
+
+  return boardHeight - bottom;
+}
 function getTotalHeight(play){
 	let sum = 0;
 	let height =getHeights(play);
@@ -73,7 +92,7 @@ return holes}
 
 
 
-export function mathness(play){
+function mathness(play){
 	let nums = [];
 	nums[0] =getTotalHeight(play);
 	nums[1] = getComLines(play);
@@ -82,4 +101,17 @@ export function mathness(play){
 	return nums;
 }	
 
+export function score(play){
 
+//score = -w * height + s * complete lines - n * holes - j * bumpiness
+//where w,s,n,j are postive values
+//or
+// score = − (Landing height) + (Eroded piece cells) − (Row transitions)− (Column transitions) − 4 × (Holes) − (Cumulative wells)
+	let nums = mathness(play);
+	let w = 1.5;
+	let s = 2;
+	let n = 1.5;
+	let j = 2.5;
+let value = (-1 * w) * nums[0] + s * nums[1] - n * nums[2] - j * nums[3];
+return value;
+}

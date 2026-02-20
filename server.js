@@ -1,5 +1,5 @@
 import express from "express"
-import {mathness} from "./math.js"
+import {bestMove} from "./model.js"
 import {allPos} from "./pos.js"
 const app = express();
 
@@ -20,11 +20,13 @@ app.post("/analyze", (req, res) => {
  const piece = req.body.piece;
  // console.log(playfield);
  //console.log(piece);
- let nums = mathness(playfield);  
+ 
  let pos = allPos(piece,playfield)
+ let move = bestMove(pos)
   //console.log(typeof(piece))
   //console.log(piece.length)
-  res.json({nums});
+  //res.json({nums});
+ //console.log(pos);
 
 
 });
