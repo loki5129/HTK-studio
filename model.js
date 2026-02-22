@@ -1,20 +1,13 @@
-function bestMove(place){
-	let score = place[0].score;
-	let index = 0;
-	for (let r = 1; r<place.length;r++){
-	let tscore = place[r].score;   
-	//console.log(tscore);
-	if (score<tscore){
-		score = tscore;
-		index = r
+import * as pos from "./pos.js";
+export function bestMove(play, piece){
+	let places = pos.allPos(play,piece);
+	index = -1000;
+	score = -1000;
+	for (let i = 0; i<place[0].length; i++ ){
+	if (place[i].score > score){
+		score = place[i].score;
+		index = i;
 		}
 	}
-return place[index]  ;
-}
-
-
-function makemove(play,place){
-	let gowhere = getMove(place);
-
-
+return index; 
 }

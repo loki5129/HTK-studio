@@ -66,12 +66,11 @@ export function allPos(pie,play) {
 		let clonedeck = clone(play);
 		      let testPiece = {
 			name: pie.name,
-        		matrix: rotated,
-        		row: -2,
-        		col: x
-			};
-	if (!canmove(testPiece.matrix, testPiece.row, testPiece.col, clonedeck)) {	
-		continue;
+			matrix: rotated,
+			row: -2,
+			col: x
+			}
+if (!canmove(testPiece.matrix, testPiece.row, testPiece.col, clonedeck)) {continue;
       }
 
       // drop piece

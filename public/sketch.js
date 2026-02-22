@@ -249,7 +249,7 @@ async function sendPlayfield(play,piece){
 			playfield: play, piece: piece})});
   //const analysis = await res.json();
     const text = await res.json();
-  console.log("AI says:", text);
+  return text; 
 }
 
 
@@ -273,6 +273,7 @@ function gameloop(){
       }
   if (tetromino){
     if (++count > 35){
+      sendPlayfield(playfield, tetromino)
       tetromino.row++
       count=0;
        if (!canmove(tetromino.matrix, tetromino.row, tetromino.col)) {

@@ -1,6 +1,6 @@
 import express from "express"
 import {bestMove} from "./model.js"
-import {allPos} from "./pos.js"
+
 const app = express();
 
 app.use((req, res, next) => {
@@ -21,12 +21,12 @@ app.post("/analyze", (req, res) => {
  // console.log(playfield);
  //console.log(piece);
  
- let pos = allPos(piece,playfield)
- let move = bestMove(pos)
+  let move = bestMove(playfield,piece)
+  
   //console.log(typeof(piece))
   //console.log(piece.length)
   //res.json({nums});
- //console.log(pos);
+ console.log(move);
 
 
 });
