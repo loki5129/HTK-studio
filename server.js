@@ -25,9 +25,9 @@ app.post("/analyze", (req, res) => {
   
   //console.log(typeof(piece))
   //console.log(piece.length)
-  //res.json({nums});
+  
  console.log(move);
-
+ res.json({move})
 
 });
 app.listen(3000, () => {

@@ -182,7 +182,7 @@ function place(){
           return showGameOver();
         }
 playfield[tetromino.row + row][tetromino.col + col] = tetromino.name;
-   sendPlayfield(playfield, tetromino);
+ 
 			}
     }
   }
@@ -195,7 +195,7 @@ playfield[tetromino.row + row][tetromino.col + col] = tetromino.name;
 	    }
      	   }
           score +=100;
-	  sendPlayfield(playfield,tetromino)
+	
 	  }
 	  else{
 	  row--;
@@ -252,12 +252,20 @@ async function sendPlayfield(play,piece){
   return text; 
 }
 
+function makeMove(col) {
+	while (col < tetromino.col){
+		tetromino.col--
+	}
+	while (col > tetromino.col){
+		tetromino.col++
+	}
 
+}
 
 
 function gameloop(){
-    console.log(score);
-    
+   // console.log(score);
+    let move;
     rf = requestAnimationFrame(gameloop);
   context.clearRect(0,0,canvas.width,canvas.height);
   drawCheck();
@@ -271,9 +279,12 @@ function gameloop(){
         context.fillRect(col * grid, row * grid, grid-1, grid-1);}
 	}
       }
+   sendPlayfield(playfield,tetromino).then(data =>{
+   if (data.move !== undefined){
+   	makeMove(data.move)}})
   if (tetromino){
     if (++count > 35){
-      sendPlayfield(playfield, tetromino)
+      
       tetromino.row++
       count=0;
        if (!canmove(tetromino.matrix, tetromino.row, tetromino.col)) {
@@ -297,7 +308,6 @@ function gameloop(){
 }
 document.addEventListener('keydown', function(e) {
        if (gameover) return;
-
   // left and right arrow keys (move)
   if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
     const col = e.key === "ArrowLeft"

@@ -52,7 +52,7 @@ function placeSim(piece, board) {
     }
   }
 }
-export function allPos(pie,play) {
+export function allPos(play,pie) {
 	let placement = []
 	let matrix = pie.matrix
 //	console.log(pie + "\n");
