@@ -252,21 +252,18 @@ async function sendPlayfield(play,piece){
   return text; 
 }
 
-function makeMove(col) {
-	while (col < tetromino.col){
-		tetromino.col--
+ function makeMove(col, piece) {
+	while (col < piece.col){
+		piece.col--
 	}
-	while (col > tetromino.col){
-		tetromino.col++
+	while (col > piece.col){
+		piece.col++
 	}
-
 }
-
 
 function gameloop(){
    // console.log(score);
-    let move;
-    rf = requestAnimationFrame(gameloop);
+  rf = requestAnimationFrame(gameloop);
   context.clearRect(0,0,canvas.width,canvas.height);
   drawCheck();
 
@@ -277,11 +274,9 @@ function gameloop(){
         const name = playfield[row][col];
         context.fillStyle = colors[name];
         context.fillRect(col * grid, row * grid, grid-1, grid-1);}
-	}
       }
-   sendPlayfield(playfield,tetromino).then(data =>{
-   if (data.move !== undefined){
-   	makeMove(data.move)}})
+    }
+   
   if (tetromino){
     if (++count > 35){
       
@@ -292,15 +287,17 @@ function gameloop(){
         place();
       }
     }
-  
+   sendPlayfield(playfield,tetromino).then(data =>{
+   if (data.move !== undefined){
+   	makeMove(data.move,tetromino)}
+	})
     context.fillStyle = colors[tetromino.name];
 
-    for (let row = 0; row < tetromino.matrix.length; row++) {
-      for (let col = 0; col < tetromino.matrix[row].length; col++) {
-        if (tetromino.matrix[row][col]) {
-
-          // drawing 1 px smaller than the grid creates a grid effect
-          context.fillRect((tetromino.col + col) * grid, (tetromino.row + row) * grid, grid-1, grid-1);
+for (let row = 0; row < tetromino.matrix.length; row++) {
+for (let col = 0; col < tetromino.matrix[row].length; col++) {
+if (tetromino.matrix[row][col]) {
+// drawing 1 px smaller than the grid creates a grid effect
+context.fillRect((tetromino.col + col) * grid, (tetromino.row + row) * grid, grid-1, grid-1);
         }
       }
     }    
@@ -330,18 +327,15 @@ document.addEventListener('keydown', function(e) {
   if(e.key === "ArrowDown") {
     const row = tetromino.row + 1;
 
-    if (!canmove(tetromino.matrix, row, tetromino.col)) {
+    if (!canmove(tetromino.matrix, row, tetromino.col)) {	
       tetromino.row = row - 1;
 
       place();
       return;
     }
-
     tetromino.row = row;
-  }
-// console.log(playfield)
-});
-
-
+    	}
+    });
+	
 
 rf = requestAnimationFrame(gameloop); 
