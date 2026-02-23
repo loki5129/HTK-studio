@@ -62,15 +62,15 @@ function nextpiece(){
 function canmove(matrix, cellRow, cellCol) {
   for (let row = 0; row < matrix.length; row++) {
     for (let col = 0; col < matrix[row].length; col++) {
-      if (matrix[row][col] && (
-          // outside the game bounds
-          cellCol + col < 0 ||
-          cellCol + col >= playfield[0].length ||
-          cellRow + row >= playfield.length ||
-          // collides with another piece
-          playfield[cellRow + row][cellCol + col])
-        ) {
-        return false;
+      if (matrix[row][col]){
+	  const r = cellRow + row;
+	  const c = cellCol + col;
+          if (c < 0 || c >= playfield[0].length) return false;
+        // vertical bounds
+        if (r >= playfield.length) return false;
+
+        // collision only if inside visible grid
+        if (r >= 0 && playfield[r][c]) return false;
       }
     }
   }
@@ -253,7 +253,12 @@ async function sendPlayfield(play,piece){
   return text; 
 }
 
- function makeMove(col, piece) {
+ function makeMove(move, piece) {
+	let col = move.col;
+	let r = move.rotation;
+	for (let s = 0; s < r; s++){
+	rotate(piece.matrix);
+	}
 	while (col < piece.col && canmove(piece.matrix, piece.row,piece.col)){
 		piece.col--
 	}
@@ -290,7 +295,8 @@ function gameloop(){
     }
    sendPlayfield(playfield,tetromino).then(data =>{
    if (data.move !== undefined){
-   	makeMove(data.move,tetromino)
+   	console.log(data)
+	makeMove(data.move,tetromino,data.r)
 	drop(tetromino.matrix,tetromino)
 	}
 	})

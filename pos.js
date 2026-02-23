@@ -79,7 +79,7 @@ if (!canmove(testPiece.matrix, testPiece.row, testPiece.col, clonedeck)) {contin
 		let score = mathFunctions.score(clonedeck);
 		     placement.push({
 		     rotation: r,
-		     col: x,
+		     col: col,
 		     score: score
       });
 		//console.log(score);

@@ -9,5 +9,6 @@ export function bestMove(play, piece){
 		index = i;
 		}
 	}
-return place[index].col; 
+console.log(place[index])
+return place[index]; 
 }
