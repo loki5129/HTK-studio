@@ -195,7 +195,11 @@ function place(){
 	}
       }
       tetromino = nextpiece();
-	  
+       sendPlayfield(playfield, tetromino).then(data => {
+  if (data.move !== undefined) {
+    makeMove(data.move, tetromino);
+  }
+});
   for (let row = 0; row < tetromino.matrix.length; row++) {
       for (let col = 0; col < tetromino.matrix[row].length; col++) {
         if (tetromino.matrix[row][col]) {
@@ -237,9 +241,17 @@ function rotate(matrix) {
 const hidden = 2;
 const vis = 20;
 const columns = 10;
-const playfield = Array.from({ length: vis + hidden}, ()=>
-	Array(columns).fill(0)
-);
+const playfield = [];
+
+// hidden rows first (TOP)
+for (let i = 0; i < hidden; i++) {
+  playfield.push(Array(columns).fill(0));
+}
+
+// then visible rows
+for (let i = 0; i < vis; i++) {
+  playfield.push(Array(columns).fill(0));
+}
 let tetromino = nextpiece();
 
 async function sendPlayfield(play,piece){
@@ -257,12 +269,14 @@ async function sendPlayfield(play,piece){
 	let col = move.col;
 	let r = move.rotation;
 	for (let s = 0; s < r; s++){
-	rotate(piece.matrix);
-	}
-	while (col < piece.col && canmove(piece.matrix, piece.row,piece.col)){
+	const rotated = rotate(piece.matrix);
+	if (canmove(rotated, piece.row, piece.col)) {
+      piece.matrix = rotated;
+	}}
+while (col < piece.col && canmove(piece.matrix, piece.row,piece.col-1)){
 		piece.col--
 	}
-	while (col > piece.col && canmove(piece.matrix,piece.row,piece.col)){
+	while (col > piece.col && canmove(piece.matrix,piece.row,piece.col-1)){
 		piece.col++
 	}
 }
@@ -274,12 +288,15 @@ function gameloop(){
   drawCheck();
 
   // draw the playfield
-  for (let row = 0; row < 20; row++) {
-    for (let col = 0; col < 10; col++) {
-      if (playfield[row][col]) {
+  for (let row = hidden; row < hidden +vis; row++) {
+    for (let col = 0; col < columns; col++) {
+     if (playfield[row][col]) {
         const name = playfield[row][col];
         context.fillStyle = colors[name];
-        context.fillRect(col * grid, row * grid, grid-1, grid-1);}
+        context.fillRect(col * grid,
+	(row - hidden) * grid,
+	grid-1,
+	grid-1);}
       }
     }
    
@@ -293,20 +310,14 @@ function gameloop(){
         place();
       }
     }
-   sendPlayfield(playfield,tetromino).then(data =>{
-   if (data.move !== undefined){
-   	console.log(data)
-	makeMove(data.move,tetromino,data.r)
-	drop(tetromino.matrix,tetromino)
-	}
-	})
+  
     context.fillStyle = colors[tetromino.name];
 
 for (let row = 0; row < tetromino.matrix.length; row++) {
 for (let col = 0; col < tetromino.matrix[row].length; col++) {
 if (tetromino.matrix[row][col]) {
 // drawing 1 px smaller than the grid creates a grid effect
-context.fillRect((tetromino.col + col) * grid, (tetromino.row + row) * grid, grid-1, grid-1);
+context.fillRect((tetromino.col + col) * grid, (tetromino.row + row-hidden) * grid, grid-1, grid-1);
         }
       }
     }    
