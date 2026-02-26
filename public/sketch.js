@@ -159,8 +159,7 @@ function piece(width, height,color,x,y){
 
 }
 function showGameOver(){
-	  cancelAnimationFrame(rf);
-  gameOver = true;
+	    gameover = true;
 
   context.fillStyle = 'black';
   context.globalAlpha = 0.75;
@@ -191,6 +190,7 @@ function place(){
 	}
 	playfield[0] = Array(playfield[0].length).fill(0);
         score +=100;
+	lines++
 	row++
 	}
       }
@@ -281,35 +281,63 @@ while (col < piece.col && canmove(piece.matrix, piece.row,piece.col-1)){
 	}
 }
 
+let level = 0;
+let lines = 0;
+let lastTime = 0;          
+let dropCount = 0;       
+let dropI = 800;    
 function gameloop(){
    // console.log(score);
-  rf = requestAnimationFrame(gameloop);
+   if (gameover){
+	showGameOver();
+	return
+	}
+    rf = requestAnimationFrame(gameloop);
+
+    const currentT = Date.now()
+    const deltaTime = currentT - lastTime
+    lastTime = currentT
+    dropCount += deltaTime
+    level = Math.floor(lines / 10) +1;
+
+    const baseTime = 800;
+    const minTime = 100;
+    dropI = Math.max(baseTime * Math.pow(0.9, level - 1),minTime);
+
+ 
+
+
+if (dropCount > dropI) {
+        tetromino.row++;
+	dropCount = 0;
+
+        if (!canmove(tetromino.matrix, tetromino.row, tetromino.col)) {
+            tetromino.row--;
+            place();
+        }
+    }
+
+
+
+
+
   context.clearRect(0,0,canvas.width,canvas.height);
   drawCheck();
+  for (let row = hidden; row < hidden + vis; row++) {
+        for (let col = 0; col < columns; col++) {
+            if (playfield[row][col]) {
+                const name = playfield[row][col];
+                context.fillStyle = colors[name];
+                context.fillRect(
+                    col * grid,
+                    (row - hidden) * grid,
+                    grid - 1,
+                    grid - 1
+                );
+            }
+        }
+    }
 
-  // draw the playfield
-  for (let row = hidden; row < hidden +vis; row++) {
-    for (let col = 0; col < columns; col++) {
-     if (playfield[row][col]) {
-        const name = playfield[row][col];
-        context.fillStyle = colors[name];
-        context.fillRect(col * grid,
-	(row - hidden) * grid,
-	grid-1,
-	grid-1);}
-      }
-    }
-   
-  if (tetromino){
-    if (++count > 35){
-      
-      tetromino.row++
-      count=0;
-       if (!canmove(tetromino.matrix, tetromino.row, tetromino.col)) {
-        tetromino.row--;
-        place();
-      }
-    }
   
     context.fillStyle = colors[tetromino.name];
 
@@ -322,7 +350,7 @@ context.fillRect((tetromino.col + col) * grid, (tetromino.row + row-hidden) * gr
       }
     }    
   }
-}
+
 document.addEventListener('keydown', function(e) {
        if (gameover) return;
   // left and right arrow keys (move)
@@ -346,7 +374,7 @@ document.addEventListener('keydown', function(e) {
 	}
   if(e.key === "ArrowDown") {
     const row = tetromino.row + 1;
-
+	dropI = 0
     if (!canmove(tetromino.matrix, row, tetromino.col)) {	
       tetromino.row = row - 1;
 

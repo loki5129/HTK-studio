@@ -92,7 +92,7 @@ return holes}
 
 
 
-function mathness(play){
+export function mathness(play){
 	let nums = [];
 	nums[0] =getTotalHeight(play);
 	nums[1] = getComLines(play);
@@ -101,17 +101,4 @@ function mathness(play){
 	return nums;
 }	
 
-export function score(play){
 
-//score = -w * height + s * complete lines - n * holes - j * bumpiness
-//where w,s,n,j are postive values
-//or
-// score = − (Landing height) + (Eroded piece cells) − (Row transitions)− (Column transitions) − 4 × (Holes) − (Cumulative wells)
-	let nums = mathness(play);
-	let w = 1.5;
-	let s = 2;
-	let n = 1.5;
-	let j = 2.5;
-let value = (-1 * w) * nums[0] + s * nums[1] - n * nums[2] - j * nums[3];
-return value;
-}

@@ -1,6 +1,6 @@
 import * as pos from "./pos.js";
-export function bestMove(play, piece){
-	let place = pos.allPos(play,piece);
+export function bestMove(play, piece weights){
+	let place = pos.allPos(play,piece,weights);
 	let index = 0;
 	let score = -Infinity;
 	for (let i = 0; i<place.length; i++ ){

@@ -1,4 +1,4 @@
-import * as mathFunctions from './math.js';
+import * as mathFunctions from './gen.js';
 function rotate(matrix) {
 	const length = matrix.length;	
 	const N = length - 1;
@@ -50,7 +50,7 @@ function placeSim(piece, board) {
         }
     }
 }			
-export function allPos(play,pie) {
+export function allPos(play,pie,weights) {
 	let placement = []
 	let matrix = pie.matrix
 //	console.log(pie + "\n");
@@ -76,7 +76,7 @@ if (!canmove(testPiece.matrix, testPiece.row, testPiece.col, clonedeck)) {contin
         testPiece.row++;
       }
 	placeSim(testPiece, clonedeck);
-		let score = mathFunctions.score(clonedeck);
+		let score = mathFunctions.score(clonedeck,weights);
 		     placement.push({
 		     rotation: r,
 		     col: col,

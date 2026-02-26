@@ -10,3 +10,7 @@ margin: auto;
   ;
 
 }
+
+body{
+ overflow : hidden;
+}

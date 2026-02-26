@@ -2,6 +2,7 @@
   "dependencies": {
     "@tensorflow/tfjs": "^4.22.0",
     "express": "^5.2.1",
+    "genetic-js": "^0.1.14",
     "path": "^0.12.7",
     "url": "^0.11.4"
   },

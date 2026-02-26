@@ -20,14 +20,14 @@ app.post("/analyze", (req, res) => {
  const piece = req.body.piece;
  // console.log(playfield);
  //console.log(piece);
- 
-  let move = bestMove(playfield,piece)
+
+ // let move = bestMove(playfield,piece)
   
   //console.log(typeof(piece))
   //console.log(piece.length)
   
  //console.log(move);
- res.json({move})
+ //res.json({move})
 
 });
 app.listen(3000, () => {
