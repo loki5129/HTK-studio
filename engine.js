@@ -1,4 +1,4 @@
-import {bestMove} from "model.js";
+import {bestMove} from "./model.js";
 //this fucntion generates a random int between the parameters 
 
 
@@ -126,45 +126,8 @@ function piece(width, height,color,x,y){
   this.y = y;
 
   this.update = function(){
-}
-function place(){
-    for (let row = 0; row < tetromino.matrix.length; row++) {
-    for (let col = 0; col < tetromino.matrix[row].length; col++) {
-      if (tetromino.matrix[row][col]) {
-	const r = tetromino.row+row;
-	const c = tetromino.col+col;
-	if (r < 0) continue;
-	playfield[r][c] = tetromino.name;
-       }
-    }
-  }
-  for (let row=playfield.length-1; row >=0; row--){
-	if (playfield[row].every((cell) => !!cell)) {
-	for (let r = row; r > 0; r--){
-		playfield[r] = [...playfield[r-1]];
-	}
-	playfield[0] = Array(playfield[0].length).fill(0);
-        lines++
-	score += 100
-	row++
-	}
-      }
-      tetromino = nextpiece();
+}}
 
-});
-  for (let row = 0; row < tetromino.matrix.length; row++) {
-      for (let col = 0; col < tetromino.matrix[row].length; col++) {
-        if (tetromino.matrix[row][col]) {
-        const r = tetromino.row + row;
-        const c = tetromino.col + col;
-        if (r >= 0 && playfield[r][c]) {return;}
-	}
-      }
-    }
-}
-
-
-	
 
 
   
@@ -175,30 +138,18 @@ function rotate(matrix) {
 	row.map((val,j)=> matrix[N-j][i]));
 	return result;
 }
-const hidden = 2;
-const vis = 20;
-const columns = 10;
-const playfield = [];
-// hidden rows first (TOP)
-for (let i = 0; i < hidden; i++) {
-  playfield.push(Array(columns).fill(0));
-}
 
-// then visible rows
-for (let i = 0; i < vis; i++) {
-  playfield.push(Array(columns).fill(0));
+let playfield = []
+let tseq = []
+function initPlayfield() {
+     playfield = [];
+    tseq = []
+    for (let i = 0; i < hidden + vis; i++) {
+        playfield.push(Array(columns).fill(0));
+    }
 }
-
-function resetBoard(){
-	playfield = [];
-	// hidden rows first (TOP)
-for (let i = 0; i < hidden; i++) {playfield.push(Array(columns).fill(0));}
-
-// then visible rows
-for (let i = 0; i < vis; i++) {playfield.push(Array(columns).fill(0));}
-}
-unction makeMove(piece, move) {
-    // 1️⃣ Apply rotations
+function makeMove(piece, move) {
+    
     for (let i = 0; i < move.rotation; i++) {
         const rotated = rotate(piece.matrix);
         if (canmove(rotated, piece.row, piece.col)) {
@@ -206,37 +157,64 @@ unction makeMove(piece, move) {
         }
     }
 
-    // 2️⃣ Move piece horizontally to target column
-    piece.col = move.column;
+       piece.col = move.column;
 
-    // 3️⃣ Drop piece instantly
+    
     while (canmove(piece.matrix, piece.row + 1, piece.col)) {
         piece.row++;
     }
 }
 
-	
-export function runGame(weights) {
+function placePiece(piece,linesObj){
+    for(let r=0;r<piece.matrix.length;r++){
+        for(let c=0;c<piece.matrix[r].length;c++){
+            if(piece.matrix[r][c]){
+                const pr = piece.row+r;
+                const pc = piece.col+c;
+                if(pr>=0 && pr < playfield.length && pc >= 0 && pc < playfield[0].length){
+	playfield[pr][pc] = piece.name;
+	 }
+        }
+    }
+}
 
-    resetBoard();
-    lines = 0;
-    score = 0;
-    gameover = false;
-
-    while (!gameover) {
-
+    // Clear lines
+    for(let r=playfield.length-1;r>=0;r--){
+        if(playfield[r].every(cell=>cell!==0)){
+            for(let rr=r;rr>0;rr--) {
+	  playfield[rr]=[...playfield[rr-1]]
+	    };
+            playfield[0]=Array(columns).fill(0);
+            linesObj.lines++;
+            linesobj.score+=100;
+            r++; // recheck this row after shifting
+        }
+    }
+}
+export function runGame(weights){
+       initPlayfield();
+    let linesobj = {lines:0,score:0};
+    let gameover = false;
+    let pieceCount = 0
+    const MAX_PIECES = 500;
+    while (!gameover && pieceCount<MAX_PIECES) {
+	pieceCount++
         let piece = nextpiece();
 
         let move = bestMove(playfield, piece, weights);
+        	
+        makeMove(piece, move);
+	 placePiece(piece,linesobj)
+	//console.log(playfield)
+	for(let r=0;r<piece.matrix.length;r++){
+            for(let c=0;c<piece.matrix[r].length;c++){
+                if(piece.matrix[r][c] && piece.row+r<0){
+                    gameover=true;
+                }
+            }
+        }
+    }
 
-        applyMove(piece, move);
-
-        
-
-        place()            }
-
-    return {
-        lines: lines,
-        score: score
-    };
+    return linesobj
 }
+

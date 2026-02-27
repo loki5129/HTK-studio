@@ -1,5 +1,5 @@
 import * as pos from "./pos.js";
-export function bestMove(play, piece weights){
+export function bestMove(play, piece ,weights){
 	let place = pos.allPos(play,piece,weights);
 	let index = 0;
 	let score = -Infinity;
@@ -9,6 +9,6 @@ export function bestMove(play, piece weights){
 		index = i;
 		}
 	}
-console.log(place[index])
+//console.log("amount of possible moves: "+place.length)
 return place[index]; 
 }
