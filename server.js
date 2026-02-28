@@ -21,7 +21,7 @@ app.post('/runGA', async (req, res) => {
      console.log(`Running GA with popSize=${popSize}, generations=${generations}`);
 
     try {
-        const finalPopulation = runGA(popSize, generations);
+        const finalPopulation = await runGA(popSize, generations);
 
         // Sort by fitness descending
         finalPopulation.sort((a, b) => b.fitness - a.fitness);

@@ -3,6 +3,7 @@ import { runGame } from './engine.js';
 import fs from "fs"
 import cliProgress from 'cli-progress';
 import os from "os"
+import { Worker } from 'worker_threads';
 export function score(play,weights){
 	//score = -w * height + s * complete lines - n * holes - j * bumpiness
 //where w,s,n,j are postive values
@@ -46,7 +47,7 @@ function genPop(N){
 
 
 async function evalPop(population){
-	const numWorker = os.cpus().length;
+	const numWorkers = os.cpus().length;
 	const chunkSize = Math.ceil(population.length / numWorkers);
     	const chunks = [];
 	for (let i = 0; i < population.length; i += chunkSize) {
@@ -142,7 +143,7 @@ while (newpop.length<N){
 	childWeights = mutate(childWeights);
 let child = {
 	weights: childWeights,
-	fitness: getFitness(childWeights) 
+	fitness: 0 
 	}
 	newpop.push(child);
 	}
