@@ -42,11 +42,12 @@ app.post("/analyze", (req, res) => {
  const playfield = req.body.playfield;
  const piece = req.body.piece;
  // console.log(playfield);
- //console.log(piece);
+ //console.log(piece); 
+ let weights = [3.0114043736396034,4.773107227762628,6.468720418314,6.14979335396455]
 
- // let move = bestMove(playfield,piece)
-  runGA(100) 
-  //console.log(typeof(piece))
+
+ let move = bestMove(playfield,piece,weights)
+   //console.log(typeof(piece))
   //console.log(piece.length)
   
  //console.log(move);

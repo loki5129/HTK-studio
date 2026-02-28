@@ -31,10 +31,10 @@ function nextpiece(){
     }
     const name = tseq.pop();
     const matrix = tetrominos[name];
-    const col = playfield[0].length / 2 - Math.ceil(matrix[0].length / 2);
+    const col = Math.floor(playfield[0].length / 2 - Math.ceil(matrix[0].length / 2));
 
     // I starts on row 21 (-1), all others start on row 22 (-2)
-    const row = 0   
+    const row = -2  
     return {
         name: name,      // name of the piece (L, O, etc.)
         matrix: matrix,  // the current rotation matrix
@@ -141,8 +141,11 @@ function rotate(matrix) {
 
 let playfield = []
 let tseq = []
+const hidden = 2;
+const vis = 20;
+const columns = 10;
 function initPlayfield() {
-     playfield = [];
+    playfield = [];
     tseq = []
     for (let i = 0; i < hidden + vis; i++) {
         playfield.push(Array(columns).fill(0));
@@ -157,7 +160,7 @@ function makeMove(piece, move) {
         }
     }
 
-       piece.col = move.column;
+       piece.col = move.col;
 
     
     while (canmove(piece.matrix, piece.row + 1, piece.col)) {
@@ -165,7 +168,7 @@ function makeMove(piece, move) {
     }
 }
 
-function placePiece(piece,linesObj){
+function placePiece(piece,linesobj,pieceCount){
     for(let r=0;r<piece.matrix.length;r++){
         for(let c=0;c<piece.matrix[r].length;c++){
             if(piece.matrix[r][c]){
@@ -185,8 +188,8 @@ function placePiece(piece,linesObj){
 	  playfield[rr]=[...playfield[rr-1]]
 	    };
             playfield[0]=Array(columns).fill(0);
-            linesObj.lines++;
-            linesobj.score+=100;
+            linesobj.lines++;
+            linesobj.score +=100 
             r++; // recheck this row after shifting
         }
     }
@@ -196,15 +199,17 @@ export function runGame(weights){
     let linesobj = {lines:0,score:0};
     let gameover = false;
     let pieceCount = 0
-    const MAX_PIECES = 500;
+    const MAX_PIECES = 5000;
     while (!gameover && pieceCount<MAX_PIECES) {
 	pieceCount++
         let piece = nextpiece();
-
-        let move = bestMove(playfield, piece, weights);
-        	
+	
+        let move = bestMove(playfield, piece,nextpiece(), weights);
+	//console.log("MOVE:", move);	
         makeMove(piece, move);
-	 placePiece(piece,linesobj)
+	placePiece(piece,linesobj,pieceCount)
+	//console.log(playfield.map(r => r.join("")).join("\n"));
+	//console.log("------");
 	//console.log(playfield)
 	for(let r=0;r<piece.matrix.length;r++){
             for(let c=0;c<piece.matrix[r].length;c++){
