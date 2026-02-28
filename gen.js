@@ -2,6 +2,7 @@ import * as mathFunctions from './math.js';
 import { runGame } from './engine.js';
 import fs from "fs"
 import cliProgress from 'cli-progress';
+import {os} from "os"
 export function score(play,weights){
 	//score = -w * height + s * complete lines - n * holes - j * bumpiness
 //where w,s,n,j are postive values
