@@ -41,14 +41,42 @@ function genPop(N){
 	}
 	return population
 }
-function getFitness(weights){
-	let totalLines=0;
-	let gamesToPlay = 1;
-	for (let i = 0; i < gamesToPlay; i++) {
-		let result = runGame(weights);
-		totalLines += result.lines
-        }
- return totalLines / gamesToPlay;}
+
+
+
+async function evalPop(population){
+	const numWorker = os.cpus().length;
+	const chunkSize = Math.ceil(population.length / numWorkers);
+    	const chunks = [];
+	for (let i = 0; i < population.length; i += chunkSize) {
+        chunks.push(
+            population.slice(i, i + chunkSize)
+                .map((ind, idx) => ({
+                    weights: ind.weights,
+                    index: i + idx
+                }))
+        );
+    }
+    const promises = chunks.map(chunk =>
+        new Promise((resolve, reject) => {
+	const worker = new Worker("./workers.js",{
+	workerData: chunk
+	});
+	worker.on('message', resolve);
+            worker.on('error', reject);
+            worker.on('exit', code => {
+                if (code !== 0)
+                reject(new Error(`Worker exited with code ${code}`))
+		})}))
+	const results = await Promise.all(promises);
+	results.flat().forEach(r => {
+        population[r.index].fitness = r.fitness;
+    });
+}
+
+
+
+
 function mutate(weights, mutationRate = 0.3, mutationStd = 1.5) {
     // weights: array of floats
     // mutationRate: chance each weight mutates
@@ -88,11 +116,10 @@ function injectRandom(pop, fraction = .2){
 	const idx = Math.floor(Math.random() * pop.length);
         pop[idx] = {weights: genWeights(),fitness: 0}}}
 
-export function runGA(N,generations){
+export async function runGA(N,generations){
 	let topgen = [];
 	let population = genPop(N);
-	for (let i=0; i<N;i++){
-		population[i].fitness = getFitness(population[i].weights)	}
+	await evalPop(population)
 const bar = new cliProgress.SingleBar({
 	format:'Gen {value}/{total} |{bar}| Best: {best} Avg:{avg}'
 	}, cliProgress.Presets.shades_classic);
@@ -121,6 +148,7 @@ let child = {
 	
 	injectRandom(newpop, 0.1)
 	population = newpop
+	await evalPop(population);
 const avgFitness =population.reduce((sum, ind) => sum + ind.fitness, 0) / N;
 
 	bar.update(g + 1, {
