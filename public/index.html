@@ -1,19 +1,21 @@
-<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="sketch.js" defer></script>
-  
-    </script>
-    <link rel="stylesheet" href="stlye.css">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="stlye.css" />
+  <script src="sketch.js" defer></script>
+  <title>Tetris</title>
 </head>
 <body>
-	<canvas width="320px" height="640px" id="game"></canvas>
-  
-		<div id="test"></div>
+    <div id="game-wrapper">
+        <canvas id="game" width="320" height="640"></canvas>
 
-	</body>
+        <div id="score-box">
+            <h3>SCORE</h3>
+            <div id="score-value">0</div>
+        </div>
+    </div>
+
+</body>
    
 </html>
 

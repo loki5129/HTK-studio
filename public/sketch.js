@@ -1,22 +1,34 @@
-//this fucntion generates a random int between the parameters 
+//this function generates a random int between the parameters 
 
-function drawCheck(){
-    
-    context.beginPath();
-    for (var x = 0; x <= bw; x += 32) {
-        context.moveTo(0.5 + x,0);
-        context.lineTo(0.5 + x , bh );
-    }
 
-    for (var x = 0; x <= bh; x += 32) {
-        context.moveTo(0, 0.5 + x );
-        context.lineTo(bw , 0.5 + x);
-    }
-    context.strokeStyle = "black";
-    context.lineWidth = 1;
-    context.stroke();
+function drawCheck() {
+  context.save();
+  context.beginPath();
+
+  for (let x = 0; x <= bw; x += 32) {
+    context.moveTo(0.5 + x, 0);
+    context.lineTo(0.5 + x, bh);
+  }
+  for (let y = 0; y <= bh; y += 32) {
+    context.moveTo(0, 0.5 + y);
+    context.lineTo(bw, 0.5 + y);
+  }
+
+  context.strokeStyle = 'rgba(40, 120, 255, 0.22)';
+  context.lineWidth = 1;
+  context.shadowColor = 'rgba(40, 120, 255, 0.25)';
+  context.shadowBlur = 2;
+  context.stroke();
+  context.restore();
 }
 
+function drawBackground() {
+  const g = context.createLinearGradient(0, 0, 0, canvas.height);
+  g.addColorStop(0, '#061329');
+  g.addColorStop(1, '#0a1f45');
+  context.fillStyle = g;
+  context.fillRect(0, 0, canvas.width, canvas.height);
+}
 
 function randint(min, max) {
   min = Math.ceil(min);
@@ -24,7 +36,7 @@ function randint(min, max) {
 
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-//
+
 // this code generates a sequneunne of the peices 
 function genS(){
     const seq =  ['I', 'J', 'L', 'O', 'S', 'T', 'Z'];
@@ -34,7 +46,6 @@ function genS(){
     tseq.push(name);
   }
 }
-//
 
 
 
@@ -118,20 +129,19 @@ const tetrominos = {
     [0,0,0],
   ]
 };
-//
+
 
 //colours for shapes
 const colors = {
-  'I': 'cyan',
-  'O': 'yellow',
-  'T': 'purple',
-  'S': 'green',
-  'Z': 'red',
-  'J': 'blue',
-  'L': 'orange'
+  'I': '#00ffff',
+  'O': '#ffd800',
+  'T': '#cc00ff',
+  'S': '#00ff66',
+  'Z': '#ff0033',
+  'J': '#0066ff',
+  'L': '#ff8800'
 };
 
-//
 
 function drop(matrix,tetrimono){
 	while(canmove(matrix,tetrimono.row +1,tetrimono.col)){
@@ -183,23 +193,43 @@ function place(){
        }
     }
   }
-  for (let row=playfield.length-1; row >=0; row--){
-	if (playfield[row].every((cell) => !!cell)) {
-	for (let r = row; r > 0; r--){
-		playfield[r] = [...playfield[r-1]];
-	}
-	playfield[0] = Array(playfield[0].length).fill(0);
-        score +=100;
-	lines++
-	row++
-	}
-      }
+let cleared = 0;
+
+for (let row = playfield.length - 1; row >= 0; row--) {
+    if (playfield[row].every(cell => !!cell)) {
+        cleared++;
+
+        for (let r = row; r > 0; r--) {
+            playfield[r] = [...playfield[r - 1]];
+        }
+        playfield[0] = Array(playfield[0].length).fill(0);
+
+        row++; 
+    }
+}
+
+// Base scoring
+let points = 0;
+if (cleared === 1) points = 100;
+else if (cleared === 2) points = 300;
+else if (cleared === 3) points = 500;
+else if (cleared === 4) points = 800;
+
+
+points *= level;
+score += points;
+lines += cleared;
+
+document.getElementById("score-value").innerText = score;
+
+console.log("Score:", score, "Lines:", lines);
       tetromino = nextpiece();
-       sendPlayfield(playfield, tetromino).then(data => {
+
+      /* sendPlayfield(playfield, tetromino).then(data => {
   if (data.move !== undefined) {
     makeMove(data.move, tetromino);
   }
-});
+}); */
   for (let row = 0; row < tetromino.matrix.length; row++) {
       for (let col = 0; col < tetromino.matrix[row].length; col++) {
         if (tetromino.matrix[row][col]) {
@@ -213,11 +243,6 @@ function place(){
     }
 }
 
-
-	 
-
-
-  
 
 
 let count =0
@@ -259,7 +284,7 @@ async function sendPlayfield(play,piece){
     	method: "POST",
    	 headers: { "Content-Type": "application/json" },
     	body: JSON.stringify({
-			playfield: play, piece: piece, next: nextpiece()})});
+			playfield: play, piece: piece})});
   //const analysis = await res.json();
     const text = await res.json();
   return text; 
@@ -281,11 +306,38 @@ while (col < piece.col && canmove(piece.matrix, piece.row,piece.col-1)){
 	}
 }
 
-let level = 0;
+let level = 1;
 let lines = 0;
 let lastTime = 0;          
 let dropCount = 0;       
-let dropI = 800;    
+let dropI = 800;   
+
+function drawBlock(x, y, color) {
+    // Base
+    context.fillStyle = color;
+    context.fillRect(x, y, grid - 1, grid - 1);
+
+    // Top + left highlight
+    context.fillStyle = "rgba(255,255,255,0.25)";
+    context.fillRect(x, y, grid - 1, 4);
+    context.fillRect(x, y, 4, grid - 1);
+
+    // Bottom + right shadow
+    context.fillStyle = "rgba(0,0,0,0.35)";
+    context.fillRect(x, y + grid - 5, grid - 1, 4);
+    context.fillRect(x + grid - 5, y, 4, grid - 1);
+}
+
+function getGhostPosition(piece) {
+    let ghostRow = piece.row;
+
+    while (canmove(piece.matrix, ghostRow + 1, piece.col)) {
+        ghostRow++;
+    }
+
+    return ghostRow;
+}
+
 function gameloop(){
    // console.log(score);
    if (gameover){
@@ -322,17 +374,39 @@ if (dropCount > dropI) {
 
 
   context.clearRect(0,0,canvas.width,canvas.height);
+  drawBackground();
   drawCheck();
+
+  // Ghost Piece
+const ghostRow = getGhostPosition(tetromino);
+
+context.save();
+context.globalAlpha = 0.10;     
+context.shadowBlur = 10;           
+context.shadowColor = colors[tetromino.name];
+
+for (let row = 0; row < tetromino.matrix.length; row++) {
+    for (let col = 0; col < tetromino.matrix[row].length; col++) {
+        if (tetromino.matrix[row][col]) {
+            drawBlock(
+                (tetromino.col + col) * grid,
+                (ghostRow + row - hidden) * grid,
+                colors[tetromino.name]
+            );
+        }
+    }
+}
+
+context.restore();
+
   for (let row = hidden; row < hidden + vis; row++) {
         for (let col = 0; col < columns; col++) {
             if (playfield[row][col]) {
                 const name = playfield[row][col];
-                context.fillStyle = colors[name];
-                context.fillRect(
-                    col * grid,
-                    (row - hidden) * grid,
-                    grid - 1,
-                    grid - 1
+                drawBlock(
+                  col * grid,
+                  (row - hidden) * grid,
+                  colors[name]
                 );
             }
         }
@@ -344,11 +418,15 @@ if (dropCount > dropI) {
 for (let row = 0; row < tetromino.matrix.length; row++) {
 for (let col = 0; col < tetromino.matrix[row].length; col++) {
 if (tetromino.matrix[row][col]) {
-// drawing 1 px smaller than the grid creates a grid effect
-context.fillRect((tetromino.col + col) * grid, (tetromino.row + row-hidden) * grid, grid-1, grid-1);
+drawBlock(
+    (tetromino.col + col) * grid,
+    (tetromino.row + row - hidden) * grid,
+    colors[tetromino.name]
+);
         }
       }
-    }    
+    } 
+       
   }
 
 document.addEventListener('keydown', function(e) {
