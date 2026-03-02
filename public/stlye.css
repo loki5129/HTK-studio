@@ -1,16 +1,56 @@
 canvas {
-    border: 1px solid #d3d3d3;
-    background-color: #f1f1f1;
-    margin: 20px
-    
-}
-.center{
-margin: auto;
-  width: 50%;
-  ;
-
+    border: 3px solid #aaa;
+    background-color: #081a3a;
+    margin: 20px;
+    width: 320px;
+    height: 640px;
+    display: block;
 }
 
-body{
- overflow : hidden;
+.center {
+    margin: auto;
+    width: 50%;
+}
+
+body {
+    overflow: hidden;
+    margin: 0;
+    background-color: #000;
+    font-family: monospace;
+}
+
+#game-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+    margin: 20px;
+}
+
+#score-box {
+    width: 160px;
+    background: #02060f;
+    padding: 16px 14px;
+    border: 1px solid #2a3e66;
+    box-shadow: 
+        0 0 12px rgba(40, 120, 255, 0.15) inset,
+        0 0 8px rgba(0, 0, 0, 0.5);
+    color: #e8f1ff;
+    border-radius: 8px;
+    font-family: monospace;
+}
+
+#score-box h3 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-align: center;
+    color: #7aa7ff;
+}
+
+#score-value {
+    font-size: 32px;
+    text-align: center;
+    font-weight: 700;
+    text-shadow: 0 0 6px rgba(122, 167, 255, 0.3);
 }

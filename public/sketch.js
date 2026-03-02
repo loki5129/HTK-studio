@@ -259,7 +259,7 @@ async function sendPlayfield(play,piece){
     	method: "POST",
    	 headers: { "Content-Type": "application/json" },
     	body: JSON.stringify({
-			playfield: play, piece: piece})});
+			playfield: play, piece: piece, next: nextpiece()})});
   //const analysis = await res.json();
     const text = await res.json();
   return text; 

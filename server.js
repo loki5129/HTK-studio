@@ -41,17 +41,18 @@ app.post("/analyze", (req, res) => {
  //console.log("BODY:", req.body);
  const playfield = req.body.playfield;
  const piece = req.body.piece;
+ const next = req.body.next;
  // console.log(playfield);
  //console.log(piece); 
- let weights = [3.0114043736396034,4.773107227762628,6.468720418314,6.14979335396455]
+ let weights = [4.499627294668548,4.061915393147684,8.348787485102694,6.924711465135386];
 
 
- let move = bestMove(playfield,piece,weights)
+ let move = bestMove(playfield,piece,next,weights)
    //console.log(typeof(piece))
   //console.log(piece.length)
   
  //console.log(move);
- //res.json({move})
+ res.json({move})
 
 });
 app.listen(3000, () => {
