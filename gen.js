@@ -14,25 +14,32 @@ export function score(play,weights){
 	let s = weights[1];
 	let n = weights[2];
 	let j = weights[3];
-let value = (-1 * w) * nums[0] +
-	    s * nums[1] - 
-	    n * nums[2] - 
-	    j * nums[3];
+    let value = nums[0] * w + nums[1] * s + nums[2] * n + nums[3] * j
 //console.log(value)
 return value;
 }
+
+function normalize(weights) {
+    const norm = Math.sqrt(weights.reduce((sum, w) => sum + w*w, 0));
+    return weights.map(w => w / norm);
+}
+
+
+
 function generateGaussian(mean,std){
   var _2PI = Math.PI * 2;
+  var value;
+  
   var u1 = Math.random();
   var u2 = Math.random();
-  
   var z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(_2PI * u2);
   var z1 = Math.sqrt(-2.0 * Math.log(u1)) * Math.sin(_2PI * u2);
-
-  return z0 * std + mean;
-}
+  value = z0 * std +mean;
+   
+   return value;
+  }
 function genWeights(){
-        let induvial = [generateGaussian(-5,5),generateGaussian(-5,5),generateGaussian(-5,5),generateGaussian(-5,5)];
+        let induvial = [generateGaussian(0,1),generateGaussian(1,1),generateGaussian(-1,1),generateGaussian(-1,1)];
 	return induvial;
 }
 function genPop(N){
@@ -79,15 +86,16 @@ async function evalPop(population){
 
 
 
-function mutate(weights, mutationRate = 0.3, mutationStd = 1.5) {
+function mutate(weights, mutationRate = 0.3, mutationStd = 1.5, generation=1) {
     // weights: array of floats
     // mutationRate: chance each weight mutates
     // mutationStd: standard deviation of change
-    
+    const decay = .995
+    const effectiveStd = mutationStd * Math.pow(decay, generation);
     const newWeights = weights.map(w => {
         if (Math.random() < mutationRate) {
             // add small Gaussian noise
-            const change = generateGaussian(0, mutationStd);
+            const change = generateGaussian(0, effectiveStd);
             return w + change;
         } else {
             return w; // no change
@@ -96,11 +104,13 @@ function mutate(weights, mutationRate = 0.3, mutationStd = 1.5) {
     
     return newWeights;
 }
-function crossover(parent1, parent2) {
-    const child = parent1.map((w, i) => {
-        return Math.random() < 0.5 ? w : parent2[i];
+function crossover(parent1, parent2, alpha = 0.1) {
+    return parent1.map((w, i) => {
+        const min = Math.min(w, parent2[i]);
+        const max = Math.max(w, parent2[i]);
+        const range = max - min;
+        return Math.random() * (range * (1 + 2*alpha)) + (min - alpha*range);
     });
-    return child;
 }
 function selction(pop, k =5){
 	let best = null;
@@ -121,7 +131,7 @@ function injectRandom(pop, fraction = .2){
 export async function runGA(N,generations){
 	let topgen = [];
 	let population = genPop(N);
-	await evalPop(population)
+ 	await evalPop(population)	
 const bar = new cliProgress.SingleBar({
 	format:'Gen {value}/{total} |{bar}| Best: {best} Avg:{avg}'
 	}, cliProgress.Presets.shades_classic);
@@ -129,32 +139,45 @@ const bar = new cliProgress.SingleBar({
     bar.start(generations, 0,{best: 0,avg: 0});
 
 for (let g =0; g <generations; g++){
+ 	const sorted = [...population].sort((a,b)=>b.fitness - a.fitness);
+
+        const eliteCount = Math.floor(N * 0.05);
+        const elites = sorted.slice(0, eliteCount);
 	const newpop = []
-const elites = [...population]
-    .sort((a,b)=>b.fitness - a.fitness)
-    .slice(0, Math.floor(N * 0.05));
-	const top =  [...population].sort((a,b)=>b.fitness - a.fitness)[0]
-	newpop.push(...elites.map(e => ({...e})));
-	topgen.push(...elites.map(e => ({...e})));
+	
+	newpop.push(...elites.map(e => ({
+    	weights: [...e.weights],
+    	fitness: e.fitness
+	})));
+
+
+
+	topgen.push(...elites.map(e => ({
+            weights: [...e.weights],
+            fitness: e.fitness
+        })));
+
 while (newpop.length<N){
 	const parent1 = selction(population);
 	const parent2 = selction(population);
 	let childWeights = crossover(parent1.weights,parent2.weights);
-	childWeights = mutate(childWeights);
-let child = {
-	weights: childWeights,
-	fitness: 0 
-	}
+	childWeights = normalize(mutate(childWeights,0.05,0.2, g));
+	let child = {
+		weights: childWeights,
+		fitness: 0 
+		}
 	newpop.push(child);
 	}
 	
 	injectRandom(newpop, 0.1)
 	population = newpop
+
 	await evalPop(population);
-const avgFitness =population.reduce((sum, ind) => sum + ind.fitness, 0) / N;
+	const best = population.reduce((a,b)=>a.fitness>b.fitness?a:b);
+	const avgFitness =population.reduce((sum, ind) => sum + ind.fitness, 0) / N;
 
 	bar.update(g + 1, {
-            best: top.fitness.toFixed(2),
+            best: best.fitness.toFixed(2),
             avg: avgFitness.toFixed(2)
         });	
 }	

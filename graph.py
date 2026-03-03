@@ -1,20 +1,25 @@
 import json
 import plotly.express as px
+import pandas as pd
 
-# Read JSON file
-with open("data.json", "r") as f:
-    data = json.load(f)  # json.load, not json.loads
+with open("fitness.json", "r") as f:
+    data = json.load(f)
 
+# Make sure this is numeric
 population = data["population"]
 
 fitness_values = [ind["fitness"] for ind in population]
-individuals = list(range(1, len(population)+1))
+
+df = pd.DataFrame({
+    "Individual": range(1, len(fitness_values) + 1),
+    "Fitness": fitness_values
+})
 
 fig = px.bar(
-    x=fitness_values,
-    y=individuals,
-    orientation='h',
-    labels={"x": "Fitness", "y": "Individual"},
+    df,
+    x="Fitness",
+    y="Individual",
+    orientation="h",
     title="Population Fitness"
 )
 

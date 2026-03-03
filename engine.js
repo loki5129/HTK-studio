@@ -168,7 +168,7 @@ function makeMove(piece, move) {
     }
 }
 
-function placePiece(piece,linesobj,pieceCount){
+function placePiece(piece,linesobj){
     for(let r=0;r<piece.matrix.length;r++){
         for(let c=0;c<piece.matrix[r].length;c++){
             if(piece.matrix[r][c]){
@@ -198,16 +198,13 @@ export function runGame(weights){
        initPlayfield();
     let linesobj = {lines:0,score:0};
     let gameover = false;
-    let pieceCount = 0
-    const MAX_PIECES = 5000;
-    while (!gameover && pieceCount<MAX_PIECES) {
-	pieceCount++
-        let piece = nextpiece();
+        while (!gameover ) {
+	let piece = nextpiece();
 	
         let move = bestMove(playfield, piece,nextpiece(), weights);
 	//console.log("MOVE:", move);	
         makeMove(piece, move);
-	placePiece(piece,linesobj,pieceCount)
+	placePiece(piece,linesobj)
 	//console.log(playfield.map(r => r.join("")).join("\n"));
 	//console.log("------");
 	//console.log(playfield)

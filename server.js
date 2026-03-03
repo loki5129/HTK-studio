@@ -2,6 +2,7 @@ import express from "express"
 import {bestMove} from "./model.js"
 import {runGA} from "./gen.js"
 import {runGame} from "./engine.js"
+import {mathness} from "./math.js"
 const app = express();
 
 app.use((req, res, next) => {
@@ -17,7 +18,7 @@ app.use(express.json());
 
 app.post('/runGA', async (req, res) => {
     const { popSize = 50, generations = 20 } = req.body;
-    console.log(runGame([0.5, -0.5, -0.5, 1.0]));
+    console.log(runGame([0.5, 0.5, 0.5, 1.0]));
      console.log(`Running GA with popSize=${popSize}, generations=${generations}`);
 
     try {
@@ -44,9 +45,10 @@ app.post("/analyze", (req, res) => {
  const next = req.body.next;
  // console.log(playfield);
  //console.log(piece); 
- let weights = [4.499627294668548,4.061915393147684,8.348787485102694,6.924711465135386];
-
-
+ //console.log(next);
+ let weights = [-0.7943184909057366,-7.930835247343651,-2.0017146632103424,-1.753269474652733]
+ let  m = mathness(playfield)
+ //console.log("holes: " + m[2])
  let move = bestMove(playfield,piece,next,weights)
    //console.log(typeof(piece))
   //console.log(piece.length)
