@@ -4,17 +4,18 @@ import fs from "fs"
 import cliProgress from 'cli-progress';
 import os from "os"
 import { Worker } from 'worker_threads';
-export function score(play,weights){
+export function score(play,weights, eroded){
 	//score = -w * height + s * complete lines - n * holes - j * bumpiness
 //where w,s,n,j are postive values
 //or
 // score = − (Landing height) + (Eroded piece cells) − (Row transitions)− (Column transitions) − 4 × (Holes) − (Cumulative wells)
-	let nums = mathFunctions.mathness(play);
+	let nums = mathFunctions.mathness(play,eroded);
 	let w = weights[0];
 	let s = weights[1];
 	let n = weights[2];
 	let j = weights[3];
-    let value = nums[0] * w + nums[1] * s + nums[2] * n + nums[3] * j
+	let e = weights[4] ?? 1.0;
+    let value = (nums[0] * w) + (nums[1] * s) + (nums[2] * n) + (nums[3] * j) + (eroded * e)
 //console.log(value)
 return value;
 }
@@ -161,7 +162,7 @@ while (newpop.length<N){
 	const parent1 = selction(population);
 	const parent2 = selction(population);
 	let childWeights = crossover(parent1.weights,parent2.weights);
-	childWeights = normalize(mutate(childWeights,0.05,0.2, g));
+	childWeights = normalize(mutate(childWeights,0.5,0.2, g));
 	let child = {
 		weights: childWeights,
 		fitness: 0 

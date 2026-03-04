@@ -63,17 +63,40 @@ export function placeMove(play,piece,move){
 if (!canmove(testPiece.matrix, testPiece.row, testPiece.col, cloned)) {
         return null; // invalid move
     }
-while (canmove(testPiece.matrix,
-	testPiece.row+1,
-	testPiece.col,
-	cloned
-	)){
+while (canmove(testPiece.matrix,testPiece.row+1,testPiece.col,cloned)){
 	testPiece.row++;
 }
 	placeSim(testPiece, cloned);
-	clearLinesSim(cloned)
-	return cloned
+	const linesCleared = countClearedLines(cloned);
+   	 const eroded = computeEroded(cloned, testPiece, linesCleared);
+
+   	 clearLinesSim(cloned);
+	return {board: cloned, eroded};
 }
+
+function countClearedLines(board) {
+    let count = 0;
+    for (let r = 0; r < board.length; r++) {
+        if (board[r].every(cell => cell !== 0)) count++;
+    }
+    return count;
+}
+function computeEroded(board, piece, linesCleared) {
+    if (linesCleared === 0) return 0;
+    let cellsRemoved = 0;
+    for (let row = 0; row < piece.matrix.length; row++) {
+        for (let col = 0; col < piece.matrix[row].length; col++) {
+            if (piece.matrix[row][col]) {
+                const absRow = piece.row + row;
+                if (absRow >= 0 && board[absRow].every(cell => cell !== 0)) {
+                    cellsRemoved++;
+                }
+            }
+        }
+    }
+    return linesCleared * cellsRemoved;
+}
+
 function clearLinesSim(board) {
     for (let r = board.length - 1; r >= 0; r--) {
         if (board[r].every(cell => cell !== 0)) {
@@ -92,22 +115,12 @@ export function allPos(play,pie,weights) {
 
 
 for ( let r=0; r < allrot.length; r++){
-	
 		let rotated = allrot[r];
-		for (let col =0;
-		col <= play[0].length - rotated[0].length;
-		col++){
-		let clonedeck = clone(play);
-		const newBoard = placeMove(play, pie, {
-                rotation: r,
-                col: col});
+for (let col =0;col <= play[0].length - rotated[0].length;col++){
+	const newBoard = placeMove(play, pie, {rotation: r,col: col});
 		if (!newBoard) continue;
-		const Tscore = score(newBoard,weights);
-		     placement.push({
-		     rotation: r,
-		     col: col,
-		     score: Tscore
-		});
+	const Tscore = score(newBoard.board,weights,newBoard.eroded);
+	placement.push({rotation: r,col: col,score: Tscore});
 	}
       }
 	return placement;

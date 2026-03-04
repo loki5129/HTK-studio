@@ -1,7 +1,7 @@
 import { parentPort, workerData } from 'worker_threads';
 import { runGame } from './engine.js';
 
-function getFitness(weights) {
+function getFitness(weights,) {
     let totalLines = 0;
     const gamesToPlay = 5;
 
