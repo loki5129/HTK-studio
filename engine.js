@@ -152,7 +152,7 @@ function initPlayfield() {
     }
 }
 function makeMove(piece, move) {
-    
+    //console.log(move) 
     for (let i = 0; i < move.rotation; i++) {
         const rotated = rotate(piece.matrix);
         if (canmove(rotated, piece.row, piece.col)) {

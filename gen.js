@@ -10,13 +10,23 @@ export function score(play,weights, eroded){
 //or
 // score = − (Landing height) + (Eroded piece cells) − (Row transitions)− (Column transitions) − 4 × (Holes) − (Cumulative wells)
 	let nums = mathFunctions.mathness(play,eroded);
-	let w = weights[0];
-	let s = weights[1];
-	let n = weights[2];
-	let j = weights[3];
-	let e = weights[4] ?? 1.0;
-    let value = (nums[0] * w) + (nums[1] * s) + (nums[2] * n) + (nums[3] * j) + (eroded * e)
-//console.log(value)
+	//console.log("NUMDERS: "+nums)
+	//console.log("erored: "+ eroded)
+	//console.log("WEIGHTS: "+ weights);
+	let w = weights[0]; // total height
+	let s = weights[1]; // complete lines
+	let n = weights[2]; // holes
+	let j = weights[3]; // bumpiness
+	let f = weights[4]; // row transitions
+	let g = weights[5] // col transitions
+	let h = weights[6] // Cumulativewelss
+	let e = weights[7]  // eroded
+	//console.log("w: "+w )
+let value = (nums[0] * w) + (nums[1] * s) + 
+(nums[2] * n) + (nums[3] * j) + 
+(nums[4] * f) + (nums[5] * g) + 
+(nums[6] * h) + (eroded * e);
+//console.log("VALUE: " + value)
 return value;
 }
 
@@ -40,7 +50,17 @@ function generateGaussian(mean,std){
    return value;
   }
 function genWeights(){
-        let induvial = [generateGaussian(0,1),generateGaussian(1,1),generateGaussian(-1,1),generateGaussian(-1,1)];
+let induvial = [
+generateGaussian(-1,1),//total heighy
+generateGaussian(1,1), // complete liens
+generateGaussian(-1,1), //holes
+generateGaussian(-1,1), // bumpiness
+generateGaussian(-1, 1), // row transitions
+generateGaussian(-1, 1), // col transitions
+generateGaussian(-1, 1), // Cumulative welss
+generateGaussian(1, 1) //erorded
+];
+	//console.log(induvial)
 	return induvial;
 }
 function genPop(N){

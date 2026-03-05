@@ -14,6 +14,26 @@ function getHeights(play){
     }
 return heights
 }
+
+
+function getRowTransitions(play) {
+    let transitions = 0;
+    const rows = play.length;
+    const cols = play[0].length;
+    for (let r = 0; r < rows; r++) {
+        // Left border transition
+        if (play[r][0] === 0) transitions++;
+        for (let c = 0; c < cols - 1; c++) {
+            const curr = play[r][c] !== 0;
+            const next = play[r][c + 1] !== 0;
+            if (curr !== next) transitions++;
+        }
+        // Right border transition
+        if (play[r][cols - 1] === 0) transitions++;
+    }
+    return transitions;
+}
+
 function getLandingHeight(pie, boardHeight = 20) {
   let bottom = -Infinity;
 
@@ -90,7 +110,42 @@ function getHoles(play) {
 	}
 return holes}
 
-
+function getCumulativeWells(play) {
+    const rows = play.length;
+    const cols = play[0].length;
+    let total = 0;
+    for (let c = 0; c < cols; c++) {
+        let depth = 0;
+        for (let r = 0; r < rows; r++) {
+            const empty = play[r][c] === 0 || play[r][c] === "0";
+            const leftWall  = c === 0        || play[r][c - 1] !== 0;
+            const rightWall = c === cols - 1 || play[r][c + 1] !== 0;
+            if (empty && leftWall && rightWall) {
+                depth++;
+                total += depth; // cumulative: depth 1=1, 2=1+2, 3=1+2+3...
+            } else {
+                depth = 0;
+            }
+        }
+    }
+    return total;
+}
+function getColTransitions(play) {
+    let transitions = 0;
+    const rows = play.length;
+    const cols = play[0].length;
+    for (let c = 0; c < cols; c++) {
+        // Top border transition
+        if (play[0][c] === 0) transitions++;
+        for (let r = 0; r < rows - 1; r++) {
+            const curr = play[r][c] !== 0;
+            const next = play[r + 1][c] !== 0;
+            if (curr !== next) transitions++;
+        }
+        // Bottom is always filled (floor)
+    }
+    return transitions;
+}
 
 export function mathness(play){
 	let nums = [];
@@ -98,6 +153,9 @@ export function mathness(play){
 	nums[1] = getComLines(play);
 	nums[2] = getHoles(play);
 	nums[3] = getBumps(play);
+	nums[4] = getRowTransitions(play)
+	nums[5] = getColTransitions(play)
+	nums[6] = getCumulativeWells(play)
 	return nums;
 }	
 

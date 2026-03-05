@@ -18,7 +18,16 @@ app.use(express.json());
 
 app.post('/runGA', async (req, res) => {
     const { popSize = 50, generations = 20 } = req.body;
-    console.log(runGame([0.5, 0.5, 0.5, 1.0]));
+    console.log(runGame([
+      -1.197797829039768,
+      0.6474174876891019,
+      -2.8833479949250598,
+      -2.5218869939922164,
+      -0.4607524621395642,
+      -1.63969073716738,
+      -1.5347502364529162,
+      -0.8560507883771952
+]));
      console.log(`Running GA with popSize=${popSize}, generations=${generations}`);
 
     try {
@@ -46,7 +55,16 @@ app.post("/analyze", (req, res) => {
  // console.log(playfield);
  //console.log(piece); 
  //console.log(next);
- let weights = [-0.7943184909057366,-7.930835247343651,-2.0017146632103424,-1.753269474652733]
+ let weights = [
+      -1.197797829039768,
+      0.6474174876891019,
+      -2.8833479949250598,
+      -2.5218869939922164,
+      -0.4607524621395642,
+      -1.63969073716738,
+      -1.5347502364529162,
+      -0.8560507883771952
+    ]
  let  m = mathness(playfield)
  //console.log("holes: " + m[2])
  let move = bestMove(playfield,piece,next,weights)

@@ -224,12 +224,11 @@ document.getElementById("score-value").innerText = score;
 
 console.log("Score:", score, "Lines:", lines);
       tetromino = nextpiece();
-
-      /* sendPlayfield(playfield, tetromino).then(data => {
+ sendPlayfield(playfield, tetromino, nextpiece()).then(data => {
   if (data.move !== undefined) {
     makeMove(data.move, tetromino);
   }
-}); */
+}); 
   for (let row = 0; row < tetromino.matrix.length; row++) {
       for (let col = 0; col < tetromino.matrix[row].length; col++) {
         if (tetromino.matrix[row][col]) {
@@ -279,14 +278,15 @@ for (let i = 0; i < vis; i++) {
 }
 let tetromino = nextpiece();
 
-async function sendPlayfield(play,piece){
+async function sendPlayfield(play,piece,next){
 	const res = await fetch("/analyze", {
     	method: "POST",
    	 headers: { "Content-Type": "application/json" },
     	body: JSON.stringify({
-			playfield: play, piece: piece})});
+			playfield: play, piece: piece, next: next})});
   //const analysis = await res.json();
     const text = await res.json();
+	
   return text; 
 }
 
