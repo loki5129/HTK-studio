@@ -119,7 +119,8 @@ for ( let r=0; r < allrot.length; r++){
 for (let col =0;col <= play[0].length - rotated[0].length;col++){
 	const newBoard = placeMove(play, pie, {rotation: r,col: col});
 	if (!newBoard) continue;
-	const Tscore = score(newBoard.board,weights,newBoard.eroded);
+const Tscore = score(newBoard.board,weights,newBoard.eroded,pie);
+
 //	console.log("SCORES: " + Tscore)
 	placement.push({rotation: r,col: col,score: Tscore});
 	}

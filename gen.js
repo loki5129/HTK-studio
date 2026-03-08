@@ -4,32 +4,29 @@ import fs from "fs"
 import cliProgress from 'cli-progress';
 import os from "os"
 import { Worker } from 'worker_threads';
-export function score(play,weights, eroded){
-	//score = -w * height + s * complete lines - n * holes - j * bumpiness
+export function score(play,weights,eroded,piece){
+//score = -w * height + s * complete lines - n * holes - j * bumpiness
 //where w,s,n,j are postive values
 //or
 // score = − (Landing height) + (Eroded piece cells) − (Row transitions)− (Column transitions) − 4 × (Holes) − (Cumulative wells)
-	let nums = mathFunctions.mathness(play,eroded);
+	
+	let nums = mathFunctions.mathness(play,piece);
+	//console.log("PIECEE: "+piece)
 	//console.log("NUMDERS: "+nums)
 	//console.log("erored: "+ eroded)
 	//console.log("WEIGHTS: "+ weights);
-	let w = weights[0]; // total height
-	let s = weights[1]; // complete lines
-	let n = weights[2]; // holes
-	let j = weights[3]; // bumpiness
-	let f = weights[4]; // row transitions
-	let g = weights[5] // col transitions
-	let h = weights[6] // Cumulativewelss
-	let e = weights[7]  // eroded
-	//console.log("w: "+w )
-let value = (nums[0] * w) + (nums[1] * s) + 
-(nums[2] * n) + (nums[3] * j) + 
-(nums[4] * f) + (nums[5] * g) + 
-(nums[6] * h) + (eroded * e);
-//console.log("VALUE: " + value)
-return value;
+	return(
+	(nums[0] * weights[0]) + // total height -
+	(nums[1] * weights[1]) + // complete lines +
+	(nums[2] * weights[2]) + // holes - 
+	(nums[3] * weights[3]) + // bumpiness - 
+	(nums[4] * weights[4]) +  // row transitions -
+	(nums[5] * weights[5]) + // col transitions - 
+	(nums[6] * weights[6]) + // Cumulativewelss -
+	(nums[7] * weights[7]) + // landing height -
+	(eroded * weights[8]) // eroded +
+	)
 }
-
 function normalize(weights) {
     const norm = Math.sqrt(weights.reduce((sum, w) => sum + w*w, 0));
     return weights.map(w => w / norm);
@@ -58,7 +55,8 @@ generateGaussian(-1,1), // bumpiness
 generateGaussian(-1, 1), // row transitions
 generateGaussian(-1, 1), // col transitions
 generateGaussian(-1, 1), // Cumulative welss
-generateGaussian(1, 1) //erorded
+generateGaussian(-1, 1),  //erorded
+generateGaussian(1,1) // landing height/
 ];
 	//console.log(induvial)
 	return induvial;

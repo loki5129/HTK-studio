@@ -36,7 +36,7 @@ function getRowTransitions(play) {
 
 function getLandingHeight(pie, boardHeight = 20) {
   let bottom = -Infinity;
-
+  //console.log("PIECE: "+pie);
   for (let row = 0; row < pie.matrix.length; row++) {
     for (let col = 0; col < pie.matrix[row].length; col++) {
 
@@ -56,7 +56,7 @@ function getLandingHeight(pie, boardHeight = 20) {
 function getTotalHeight(play){
 	let sum = 0;
 	let height =getHeights(play);
-	for (let i=0;i<height.length-1;i++){
+	for (let i=0;i<height.length;i++){
 	sum +=height[i];
 	}
 	return sum;
@@ -147,7 +147,7 @@ function getColTransitions(play) {
     return transitions;
 }
 
-export function mathness(play){
+export function mathness(play, piece=null){
 	let nums = [];
 	nums[0] =getTotalHeight(play);
 	nums[1] = getComLines(play);
@@ -156,6 +156,7 @@ export function mathness(play){
 	nums[4] = getRowTransitions(play)
 	nums[5] = getColTransitions(play)
 	nums[6] = getCumulativeWells(play)
+	nums[7] = piece ? getLandingHeight(piece) : 0;
 	return nums;
 }	
 

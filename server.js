@@ -26,7 +26,8 @@ app.post('/runGA', async (req, res) => {
       -0.4607524621395642,
       -1.63969073716738,
       -1.5347502364529162,
-      -0.8560507883771952
+      -0.8560507883771952,
+      -0.822222222222222
 ]));
      console.log(`Running GA with popSize=${popSize}, generations=${generations}`);
 
@@ -63,7 +64,8 @@ app.post("/analyze", (req, res) => {
       -0.4607524621395642,
       -1.63969073716738,
       -1.5347502364529162,
-      -0.8560507883771952
+      -0.8560507883771952,
+      -0.5
     ]
  let  m = mathness(playfield)
  //console.log("holes: " + m[2])
