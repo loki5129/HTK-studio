@@ -23,14 +23,13 @@ function genS(){
 //
 
 
-
 //this function gets the next piece from the sequnce and makes it into the proper martix so it be used
 function nextpiece(){
     if (tseq.length ==0){
         genS();
     }
     const name = tseq.pop();
-    const matrix = tetrominos[name];
+    const matrix = tetrominos[name].map(r => [...r]);
     const col = Math.floor(playfield[0].length / 2 - Math.ceil(matrix[0].length / 2));
 
     // I starts on row 21 (-1), all others start on row 22 (-2)
@@ -194,14 +193,61 @@ function placePiece(piece,linesobj){
         }
     }
 }
+function reset(piece){
+piece.row = 0;
+piece.col = playfield[0].length / 2 - Math.ceil(piece.matrix[0].length / 2);
+}
+let canhold = true
+let hpiece = ""
+function Hold(piece) {
+    if (!canhold) return piece;
+	canhold = false
+    if(hpiece === ''){
+        hpiece = piece.name;
+	return nextpiece()}
+    else{
+        var temp = hpiece;
+	hpiece = piece.name;
+	const matrix = tetrominos[temp].map(r =>[...r]);
+	const col = Math.floor(playfield[0].length / 2 - Math.ceil(matrix[0].length / 2));
+	return { name: temp, matrix, row: -2, col }
+	
+     
+	hpiece = temp;
+        canhold = false;
+    }}
+
 export function runGame(weights){
        initPlayfield();
     let linesobj = {lines:0,score:0};
     let gameover = false;
+    canhold = true
+	var hpiece ="";
         while (!gameover ) {
 	let piece = nextpiece();
+	canhold = true
+	if (hpiece === ""){
+		piece =Hold(piece)
+		}
+	 const held = hpiece !=="" ? {
+            name: hpiece,
+            matrix: tetrominos[hpiece].map(r => [...r]),
+            row: -2,
+            col: Math.floor(playfield[0].length / 2 - Math.ceil(tetrominos[hpiece][0].length / 2))
+        } : null;
+	if (tseq.length === 0) genS();
+        const nextPiece = {
+            name: tseq[tseq.length - 1],
+            matrix: tetrominos[tseq[tseq.length - 1]].map(r => [...r]),
+            row: -2,
+            col: Math.floor(playfield[0].length / 2 - Math.ceil(tetrominos[tseq[tseq.length - 1]][0].length / 2))
+        };
+	let obj = bestMove(playfield, piece,nextPiece,held, weights);
+	let move = obj.move
+	let swap = obj.swap
+	if (swap){
+		piece = Hold(piece);}
 	
-        let move = bestMove(playfield, piece,nextpiece(), weights);
 	//console.log("MOVE:", move);	
         makeMove(piece, move);
 	placePiece(piece,linesobj)
