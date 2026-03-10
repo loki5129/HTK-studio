@@ -151,6 +151,7 @@ function showGameOverp(){
   contextp.fillText('GAME OVER!', canvasp.width / 2, canvasp.height / 2);
 }
 function placep(){
+    canholdp = true;
     for (let row = 0; row < tetrominop.matrix.length; row++) {
     for (let col = 0; col < tetrominop.matrix[row].length; col++) {
       if (tetrominop.matrix[row][col]) {
@@ -239,10 +240,36 @@ function getGhostPositionp(piece) {
 
     return ghostRow;
 }
-
-
+function reset(){
+tetrominop.row = 0;
+tetrominop.col = playfieldp[0].length / 2 - Math.ceil(tetrominop.matrix[0].length / 2);
+}
+var hpiecep = "";
+var canholdp = true;
+function playerHold() {
+    if(hpiecep === '' && canholdp){
+        hpiecep = tetrominop.name;
+	tetrominop = nextpiecep()
+        reset();
+        canholdp = false;
+    }
+    else if(canholdp){
+        
+        var temp = tetrominop.name;
+	
+        tetrominop = {
+            name: hpiecep,
+            matrix: tetrominos[hpiecep].map(r => [...r]),
+            row: 0,
+            col: 0
+        };       
+	reset();
+        hpiecep = temp;
+        canholdp = false;
+    }}
 function gameloopp(){
    // console.log(score);
+   console.log(tetrominop.name)
    if (gameoverp){
 	showGameOverp();
 	return
@@ -364,6 +391,9 @@ document.addEventListener('keydown', function(e) {
     }
     tetrominop.row = row;
     	}
+  if (e.key ==="c" || e.key === "C"){
+	playerHold();
+		}
      
 });
 	
