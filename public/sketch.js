@@ -220,7 +220,7 @@ points *= level;
 score += points;
 lines += cleared;
 
-document.getElementById("score-value").innerText = score;
+document.getElementById("score-value-model").innerText = score;
 
 console.log("Score:", score, "Lines:", lines);
       tetromino = nextpiece();
@@ -245,7 +245,7 @@ console.log("Score:", score, "Lines:", lines);
 
 
 let count =0
-const canvas = document.getElementById('game');
+const canvas = document.getElementById('model');
 const context = canvas.getContext('2d');
 var bw = canvas.width;
 var bh = canvas.height;
@@ -277,7 +277,8 @@ for (let i = 0; i < vis; i++) {
   playfield.push(Array(columns).fill(0));
 }
 let tetromino = nextpiece();
-
+let hp = hold(tetromino);
+tetromino = hp.piece;
 async function sendPlayfield(play,piece,next){
 	const res = await fetch("/analyze", {
     	method: "POST",
@@ -338,6 +339,14 @@ function getGhostPosition(piece) {
     return ghostRow;
 }
 
+function hold(piece){
+	let heldPiece = piece;
+	piece = nextpiece()
+	return {piece:piece, held: heldPiece}
+}
+function swap(dict){
+	return {piece: dict.held, held: dict.piece}
+}
 function gameloop(){
    // console.log(score);
    if (gameover){
@@ -345,7 +354,7 @@ function gameloop(){
 	return
 	}
     rf = requestAnimationFrame(gameloop);
-
+    
     const currentT = Date.now()
     const deltaTime = currentT - lastTime
     lastTime = currentT
@@ -428,40 +437,6 @@ drawBlock(
     } 
        
   }
-
-document.addEventListener('keydown', function(e) {
-       if (gameover) return;
-  // left and right arrow keys (move)
-  if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
-    const col = e.key === "ArrowLeft"
-      ? tetromino.col - 1
-      : tetromino.col + 1;
-
-    if (canmove(tetromino.matrix, tetromino.row, col)) {
-      tetromino.col = col;
-    }
-  }
-  if (e.key === "ArrowUp"){
-	const matrix = rotate(tetromino.matrix);
-	if (canmove(matrix,tetromino.row,tetromino.col)){
-		tetromino.matrix = matrix;
-		}
-	}
-  if (e.key === " "){
-	drop(tetromino.matrix,tetromino);	
-	}
-  if(e.key === "ArrowDown") {
-    const row = tetromino.row + 1;
-	dropI = 0
-    if (!canmove(tetromino.matrix, row, tetromino.col)) {	
-      tetromino.row = row - 1;
-
-      place();
-      return;
-    }
-    tetromino.row = row;
-    	}
-    });
 	
 
 rf = requestAnimationFrame(gameloop); 
