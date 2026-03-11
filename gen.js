@@ -27,11 +27,6 @@ export function score(play,weights,eroded,piece){
 	(eroded * weights[8]) // eroded +
 	)
 }
-function normalize(weights) {
-    const norm = Math.sqrt(weights.reduce((sum, w) => sum + w*w, 0));
-    return weights.map(w => w / norm);
-}
-
 
 
 function generateGaussian(mean,std){
@@ -128,7 +123,7 @@ function crossover(parent1, parent2 ){
    	Math.random()< 0.5 ? w : parent2[i] 
     );
 }
-function selction(pop, k =15){
+function selction(pop, k =3){
 	let best = null;
 	for (let i = 0; i < k; i++) {
 const ind = pop[Math.floor(Math.random() * pop.length)];
@@ -144,6 +139,39 @@ function injectRandom(pop, fraction = .1){
 	const idx = Math.floor(Math.random() * pop.length);
         pop[idx] = {weights: genWeights(),fitness: 0}}}
 
+const ISLAND_COUNT = 4;
+const MIGRATION_INTERVAL = 10
+
+function splitIntoIslands(population, count) {
+    const size = Math.ceil(population.length / count);
+    return Array.from({ length: count }, (_, i) =>
+        population.slice(i * size, (i + 1) * size)
+    );
+}
+
+function mergeIslands(islands) {
+    return islands.flat();
+}
+
+function migrateIslands(islands) {
+    // Each island sends its best individual to a random different island.
+    const migrants = islands.map(island =>
+        [...island].sort((a, b) => b.fitness - a.fitness)[0]
+    );
+    islands.forEach((island, i) => {
+        let target;
+        do { target = Math.floor(Math.random() * islands.length); } while (target === i);
+        // Replace a random non-top-5 slot in the target island.
+        const slot = 5 + Math.floor(Math.random() * Math.max(1, island.length - 5));
+        if (slot < islands[target].length) {
+            islands[target][slot] = { weights: [...migrants[i].weights], fitness: migrants[i].fitness };
+        }
+    });
+}
+
+
+
+
 export async function runGA(N,generations){
 	let topgen = [];
 	let population = genPop(N);
@@ -154,48 +182,49 @@ const bar = new cliProgress.SingleBar({
  
     bar.start(generations, 0,{best: 0,avg: 0});
 
+
+    let islands = splitIntoIslands(population,ISLAND_COUNT);
+
+
 for (let g =0; g <generations; g++){
- 	const sorted = [...population].sort((a,b)=>b.fitness - a.fitness);
+if (g > 0 && g % MIGRATION_INTERVAL === 0) {
+            migrateIslands(islands);
+        }
+ 	const newIslands = islands.map(island => {
+const sorted = [...island].sort((a, b) => b.fitness - a.fitness);
+const eliteCount = Math.max(1, Math.floor(island.length * 0.05));
+        const newIsland = sorted.slice(0, eliteCount).map(e => ({
+                weights: [...e.weights], fitness: e.fitness
+            }));
+	  while (newIsland.length < island.length) {
+                const p1 = selction(island);
+                const p2 = selction(island);
+                let childWeights = crossover(p1.weights, p2.weights);
+                childWeights = mutate(childWeights, 0.3, 1.5, g);
+                newIsland.push({ weights: childWeights, fitness: 0 });
+            }
 
+            if (g > 10) injectRandom(newIsland, 0.1);
+            return newIsland;
+        });
+
+	islands = newIslands;
+        population = mergeIslands(islands);   // flatten for eval
+        await evalPop(population);
+        islands = splitIntoIslands(population, ISLAND_COUNT)
+const sorted = [...population].sort((a, b) => b.fitness - a.fitness);
         const eliteCount = Math.floor(N * 0.05);
-        const elites = sorted.slice(0, eliteCount);
-	const newpop = []
-	
-	newpop.push(...elites.map(e => ({
-    	weights: [...e.weights],
-    	fitness: e.fitness
-	})));
-
-
-
-	topgen.push(...elites.map(e => ({
-            weights: [...e.weights],
-            fitness: e.fitness
+        topgen.push(...sorted.slice(0, eliteCount).map(e => ({
+            weights: [...e.weights], fitness: e.fitness
         })));
-
-while (newpop.length<N){
-	const parent1 = selction(population);
-	const parent2 = selction(population);
-	let childWeights = crossover(parent1.weights,parent2.weights);
-	childWeights = mutate(childWeights,0.3,1.5, g);
-	let child = {
-		weights: childWeights,
-		fitness: 0 
-		}
-	newpop.push(child);
-	}
-	if (g>10){
-	injectRandom(newpop, 0.1)}
-	population = newpop
-
-	await evalPop(population);
-	const best = population.reduce((a,b)=>a.fitness>b.fitness?a:b);
-	const avgFitness =population.reduce((sum, ind) => sum + ind.fitness, 0) / N;
-
+	const best = sorted[0];
+        const avgFitness = population.reduce((sum, ind) => sum + ind.fitness, 0) / N;
 	bar.update(g + 1, {
             best: best.fitness.toFixed(2),
             avg: avgFitness.toFixed(2)
         });	
+
+
 }	
 
 bar.stop()
