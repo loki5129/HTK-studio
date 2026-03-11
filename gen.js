@@ -109,7 +109,7 @@ function mutate(weights, mutationRate = 0.3, mutationStd = 1.5, generation=1) {
     // weights: array of floats
     // mutationRate: chance each weight mutates
     // mutationStd: standard deviation of change
-    const decay = .995
+    const decay = .97
     const effectiveStd = mutationStd * Math.pow(decay, generation);
     const newWeights = weights.map(w => {
         if (Math.random() < mutationRate) {
@@ -123,15 +123,12 @@ function mutate(weights, mutationRate = 0.3, mutationStd = 1.5, generation=1) {
     
     return newWeights;
 }
-function crossover(parent1, parent2, alpha = 0.1) {
-    return parent1.map((w, i) => {
-        const min = Math.min(w, parent2[i]);
-        const max = Math.max(w, parent2[i]);
-        const range = max - min;
-        return Math.random() * (range * (1 + 2*alpha)) + (min - alpha*range);
-    });
+function crossover(parent1, parent2 ){
+    return parent1.map((w, i) => 
+   	Math.random()< 0.5 ? w : parent2[i] 
+    );
 }
-function selction(pop, k =5){
+function selction(pop, k =15){
 	let best = null;
 	for (let i = 0; i < k; i++) {
 const ind = pop[Math.floor(Math.random() * pop.length)];
@@ -141,7 +138,7 @@ const ind = pop[Math.floor(Math.random() * pop.length)];
 	}
 	return best
 }
-function injectRandom(pop, fraction = .2){
+function injectRandom(pop, fraction = .1){
 	 const numToInject = Math.floor(pop.length * fraction)
 	for (let i =0;i<numToInject;i++){
 	const idx = Math.floor(Math.random() * pop.length);
@@ -180,15 +177,15 @@ while (newpop.length<N){
 	const parent1 = selction(population);
 	const parent2 = selction(population);
 	let childWeights = crossover(parent1.weights,parent2.weights);
-	childWeights = normalize(mutate(childWeights,0.5,0.2, g));
+	childWeights = mutate(childWeights,0.3,1.5, g);
 	let child = {
 		weights: childWeights,
 		fitness: 0 
 		}
 	newpop.push(child);
 	}
-	
-	injectRandom(newpop, 0.1)
+	if (g>10){
+	injectRandom(newpop, 0.1)}
 	population = newpop
 
 	await evalPop(population);

@@ -3,7 +3,7 @@ import { runGame } from './engine.js';
 
 function getFitness(weights,) {
     let totalLines = 0;
-    const gamesToPlay = 1;
+    const gamesToPlay = 2;
 
     for (let i = 0; i < gamesToPlay; i++) {
         const result = runGame(weights);

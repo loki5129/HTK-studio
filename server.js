@@ -53,6 +53,7 @@ app.post("/analyze", (req, res) => {
  const playfield = req.body.playfield;
  const piece = req.body.piece;
  const next = req.body.next;
+ //const held = req.body.held
  // console.log(playfield);
  //console.log(piece); 
  //console.log(next);
@@ -69,7 +70,7 @@ app.post("/analyze", (req, res) => {
     ]
  let  m = mathness(playfield)
  //console.log("holes: " + m[2])
- let move = bestMove(playfield,piece,next,weights)
+ //let move = bestMove(playfield,piece,next,held,weights)
    //console.log(typeof(piece))
   //console.log(piece.length)
   

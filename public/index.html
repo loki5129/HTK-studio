@@ -1,3 +1,7 @@
+<!DOCTYPE html>
+
+
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,22 +15,81 @@
 </head>
 <body>
     <div id="game-wrapper">
+	<div id="left-panel">
+        <div id="stats-group" class="info-box">
+            <div class="stat">
+                <h3>SCORE</h3>
+                <div id="score-value-play">0</div>
+            </div>
+            <div class="stat">
+                <h3>LINES</h3>
+                <div id="lines-value-play">0</div>
+            </div>
+            <div class="stat">
+                <h3>LEVEL</h3>
+                <div id="level-value-play">1</div>
+            </div>
+        </div>
+    </div>
+	<div class="playfield-frame">
         <canvas id="playable" width="320" height="640"></canvas>
+		</div>
+<div id="next-panel">
+        <div class="info-box">
+            <h3>NEXT</h3>
+            <div id="next-preview">
+                <canvas id="next-0-play" width="70" height="70"></canvas>
+                <canvas id="next-1-play" width="70" height="70"></canvas>
+                <canvas id="next-2-play" width="70" height="70"></canvas>
+            </div>
+		</div>
+	   <button id="reset-btn">Reset</button>
+        <button id="pause-btn">Pause</button>
+	</div>
+	</div>
 
-        <div id="score-box">
-            <h3>SCORE</h3>
-            <div id="score-value-play">0</div>
+
+
+
+
+<div id="game-wrapper">
+
+    <div id="left-panel">
+        <div id="stats-group" class="info-box">
+            <div class="stat">
+                <h3>SCORE</h3>
+                <div id="score-value-model">0</div>
+            </div>
+            <div class="stat">
+                <h3>LINES</h3>
+                <div id="lines-value-model">0</div>
+            </div>
+            <div class="stat">
+                <h3>LEVEL</h3>
+                <div id="level-value-model">1</div>
+            </div>
         </div>
     </div>
-    <div id="game-wrapper">
+
+    <div class="playfield-frame">
         <canvas id="model" width="320" height="640"></canvas>
-
-        <div id="score-box">
-            <h3>SCORE</h3>
-            <div id="score-value-model">0</div>
-        </div>
     </div>
-</body>
+
+    <div id="next-panel">
+        <div class="info-box">
+            <h3>NEXT</h3>
+            <div id="next-preview">
+                <canvas id="next-0-model" width="70" height="70"></canvas>
+                <canvas id="next-1-model" width="70" height="70"></canvas>
+                <canvas id="next-2-model" width="70" height="70"></canvas>
+            </div>
+        </div>
+
+        <button id="reset-btn">Reset</button>
+        <button id="pause-btn">Pause</button>
+    </div>
+
+</div></body>
    
 </html>
 
