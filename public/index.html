@@ -8,88 +8,107 @@
   <link rel="stylesheet" href="stlye.css" />
   <script src="sketch.js" defer></script>
   <script src ="play.js" defer></script>
-  	
-  	
+  <script src="stars.js" defer></script>
+  
   
   <title>Tetris</title>
 </head>
 <body>
+<canvas id="starfield"></canvas>
+<nav id="taskbar">
+    <div id="taskbar-left">
+        <div id="taskbar-logo">
+            <span class="logo-bracket">[</span>
+            <span class="logo-text">TETRIS</span>
+            <span class="logo-bracket">]</span>
+        </div>
+        <div id="taskbar-subtitle">Machine Learning Tetris</div>
+    </div>
+</nav>
+  <div id="outer-wrapper">
+
     <div id="game-wrapper">
-	<div id="left-panel">
-        <div id="stats-group" class="info-box">
-            <div class="stat">
-                <h3>SCORE</h3>
-                <div id="score-value-play">0</div>
-            </div>
-            <div class="stat">
-                <h3>LINES</h3>
-                <div id="lines-value-play">0</div>
-            </div>
-            <div class="stat">
-                <h3>LEVEL</h3>
-                <div id="level-value-play">1</div>
+      <div id="left-panel">
+        <div class="info-box">
+            <h3>HOLD</h3>
+            <div id="hold-preview">
+                <canvas id="hold-play" width="70" height="70"></canvas>
             </div>
         </div>
-    </div>
-	<div class="playfield-frame">
-        <canvas id="playable" width="320" height="640"></canvas>
-		</div>
-<div id="next-panel">
+        <div id="stats-group" class="info-box">
+          <div class="stat"><h3>SCORE</h3><div id="score-value-play">0</div></div>
+          <div class="stat"><h3>LINES</h3><div id="lines-value-play">0</div></div>
+          <div class="stat"><h3>LEVEL</h3><div id="level-value-play">1</div></div>
+        </div>
+      </div>
+        <div class="playfield-frame">
+            <div class="player-label">PLAYER 1</div>
+            <canvas id="playable" width="320" height="640"></canvas>
+        </div>
+        <div id="next-panel">
         <div class="info-box">
             <h3>NEXT</h3>
             <div id="next-preview">
-                <canvas id="next-0-play" width="70" height="70"></canvas>
-                <canvas id="next-1-play" width="70" height="70"></canvas>
-                <canvas id="next-2-play" width="70" height="70"></canvas>
+            <canvas id="next-0-play" width="70" height="70"></canvas>
+            <canvas id="next-1-play" width="70" height="70"></canvas>
+            <canvas id="next-2-play" width="70" height="70"></canvas>
             </div>
-		</div>
-	   <button id="reset-btn">Reset</button>
-        <button id="pause-btn">Pause</button>
-	</div>
-	</div>
-
-
-
-
-
-<div id="game-wrapper">
-
-    <div id="left-panel">
-        <div id="stats-group" class="info-box">
-            <div class="stat">
-                <h3>SCORE</h3>
-                <div id="score-value-model">0</div>
-            </div>
-            <div class="stat">
-                <h3>LINES</h3>
-                <div id="lines-value-model">0</div>
-            </div>
-            <div class="stat">
-                <h3>LEVEL</h3>
-                <div id="level-value-model">1</div>
-            </div>
+        </div>
         </div>
     </div>
 
-    <div class="playfield-frame">
-        <canvas id="model" width="320" height="640"></canvas>
+    <div id="center-controls">
+        <div id="vs-label">VS</div>
+        <button id="pause-btn" title="Pause">&#10074;&#10074;</button>
+        <button id="reset-btn" title="Reset">&#8635;</button>
+        <button id="shortcuts-btn" title="Shortcuts">&#9432;</button>
     </div>
 
-    <div id="next-panel">
+    <div id="game-wrapper-model">
+      <div id="left-panel-model">
+        <div class="info-box">
+        <h3>HOLD</h3>
+            <div id="hold-preview-model">
+                <canvas id="hold-model" width="70" height="70"></canvas>
+            </div>
+        </div>
+        <div id="stats-group-model" class="info-box">
+          <div class="stat"><h3>SCORE</h3><div id="score-value-model">0</div></div>
+          <div class="stat"><h3>LINES</h3><div id="lines-value-model">0</div></div>
+          <div class="stat"><h3>LEVEL</h3><div id="level-value-model">1</div></div>
+        </div>
+      </div>
+        <div class="playfield-frame">
+            <div class="player-label">PLAYER 2</div>
+            <canvas id="model" width="320" height="640"></canvas>
+        </div>
+        <div id="next-panel-model">
         <div class="info-box">
             <h3>NEXT</h3>
-            <div id="next-preview">
-                <canvas id="next-0-model" width="70" height="70"></canvas>
-                <canvas id="next-1-model" width="70" height="70"></canvas>
-                <canvas id="next-2-model" width="70" height="70"></canvas>
+            <div id="next-preview-model">
+            <canvas id="next-0-model" width="70" height="70"></canvas>
+            <canvas id="next-1-model" width="70" height="70"></canvas>
+            <canvas id="next-2-model" width="70" height="70"></canvas>
             </div>
         </div>
-
-        <button id="reset-btn">Reset</button>
-        <button id="pause-btn">Pause</button>
+        </div>
     </div>
 
-</div></body>
+  </div>
+  <div id="shortcuts-overlay">
+    <div id="shortcuts-box">
+        <h3>CONTROLS</h3>
+        <div class="shortcut-row"><span class="key">←→</span><span>Move</span></div>
+        <div class="shortcut-row"><span class="key">↑</span><span>Rotate</span></div>
+        <div class="shortcut-row"><span class="key">↓</span><span>Soft Drop</span></div>
+        <div class="shortcut-row"><span class="key">SPACE</span><span>Hard Drop</span></div>
+        <div class="shortcut-row"><span class="key">C</span><span>Hold</span></div>
+        <div class="shortcut-row"><span class="key">P</span><span>Pause</span></div>
+        <div class="shortcut-row"><span class="key">i</span><span>View shortcuts</span></div>
+        <button id="shortcuts-close">✕</button>
+    </div>
+</div>
+</body>
    
 </html>
 
