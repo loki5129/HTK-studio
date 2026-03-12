@@ -227,7 +227,7 @@ for (let g =0; g <generations; g++){
 
 	const mstd  = 1.5 * Math.pow(0.995,g);
 	const mrate = Math.max(0.1,0.4-g*0.001);
-	const k     = Math.min(3+Math.floor((g/10),20))
+	const k     = Math.min(3+Math.floor(g/10),20)
  	islands = islands.map(island => {
 const sorted = [...island].sort((a, b) => b.fitness - a.fitness);
 const eliteCount = Math.max(1, Math.floor(island.length * 0.1));
@@ -256,12 +256,12 @@ const eliteCount = Math.max(1, Math.floor(island.length * 0.1));
 	fs.writeFileSync(`checkpoint_gen${g}.json`, JSON.stringify({
     generation: g,
     best: hall[0],
-    population
-}));
+    allInd
+	}));
 	bar.update(g + 1, {
             best: best?.fitness.toFixed(1) ?? 0,
             avg: avg.toFixed(1),
-	    Hof: hall[0]?.fitness.toFixed(1) ?? 0.
+	    hof: hall[0]?.fitness.toFixed(1) ?? 0.
         });	
 
 
