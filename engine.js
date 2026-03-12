@@ -193,60 +193,59 @@ function placePiece(piece,linesobj){
         }
     }
 }
-function reset(piece){
-piece.row = 0;
-piece.col = playfield[0].length / 2 - Math.ceil(piece.matrix[0].length / 2);
+
+
+function Hold(piece, state) {  // state = { hpiece, canhold }
+    if (!state.canhold) return { piece, state };
+    state.canhold = false;
+    if (state.hpiece === '') {
+        state.hpiece = piece.name;
+        return { piece: nextpiece(state), state };
+    } else {
+        const temp = state.hpiece;
+        state.hpiece = piece.name;
+        const matrix = tetrominos[temp].map(r => [...r]);
+        const col = Math.floor(playfield[0].length / 2 - Math.ceil(matrix[0].length / 2));
+        return { piece: { name: temp, matrix, row: -2, col }, state };
+    }
 }
-let canhold = true
-let hpiece = ""
-function Hold(piece) {
-    if (!canhold) return piece;
-	canhold = false
-    if(hpiece === ''){
-        hpiece = piece.name;
-	return nextpiece()}
-    else{
-        var temp = hpiece;
-	hpiece = piece.name;
-	const matrix = tetrominos[temp].map(r =>[...r]);
-	const col = Math.floor(playfield[0].length / 2 - Math.ceil(matrix[0].length / 2));
-	return { name: temp, matrix, row: -2, col }
-	
-     
-	hpiece = temp;
-        canhold = false;
-    }}
+function peekNext() {
+    if (tseq.length === 0) genS();
+    return tseq[tseq.length - 1];
+}
 
 export function runGame(weights){
        initPlayfield();
     let linesobj = {lines:0,score:0};
     let gameover = false;
-    canhold = true
-	var hpiece ="";
-        while (!gameover ) {
+    
+    let state = {hpiece: "",canhold:true}
+      while (!gameover ) {
 	let piece = nextpiece();
-	canhold = true
-	if (hpiece === ""){
-		piece =Hold(piece)
+	state.canhold = true
+	if (state.hpiece === ""){
+		({piece,state} =Hold(piece,state))
 		}
-	 const held = hpiece !=="" ? {
-            name: hpiece,
-            matrix: tetrominos[hpiece].map(r => [...r]),
+	 const held = state.hpiece !=="" ? {
+            name: state.hpiece,
+            matrix: tetrominos[state.hpiece].map(r => [...r]),
             row: -2,
-            col: Math.floor(playfield[0].length / 2 - Math.ceil(tetrominos[hpiece][0].length / 2))
+            col: Math.floor(playfield[0].length / 2 - Math.ceil(tetrominos[state.hpiece][0].length / 2))
         } : null;
-	if (tseq.length === 0) genS();
-        const nextPiece = {
-            name: tseq[tseq.length - 1],
-            matrix: tetrominos[tseq[tseq.length - 1]].map(r => [...r]),
-            row: -2,
-            col: Math.floor(playfield[0].length / 2 - Math.ceil(tetrominos[tseq[tseq.length - 1]][0].length / 2))
-        };
+	const nextName = peekNext()
+  const nextPiece = {
+    name: nextName,
+    matrix: tetrominos[nextName].map(r => [...r]),
+    row: -2,
+    col: Math.floor(playfield[0].length / 2 - Math.ceil(tetrominos[nextName][0].length / 2))
+};
+//console.log("HELD: " + held)
+//console.log("NEXT: " + nextPiece)
 	let obj = bestMove(playfield, piece,nextPiece,held, weights);
 	let move = obj.move
 	let swap = obj.swap
 	if (swap){
-		piece = Hold(piece);}
+		 ({ piece, state } = Hold(piece, state));}
 	
 	//console.log("MOVE:", move);	
         makeMove(piece, move);
