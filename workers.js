@@ -13,9 +13,12 @@ function getFitness(weights,) {
     return totalLines / gamesToPlay;
 }
 
-const results = workerData.map(ind => ({
-    index: ind.index,
-    fitness: getFitness(ind.weights)
-}));
+parentPort.on('message',chunk =>{
+	const results = chunk.map(ind => ({
+	index: ind.index,
+	fitness: getFitness(ind.weights)
+	}));
+	parentPort.postMessage(results);
+});
 
-parentPort.postMessage(results);
+

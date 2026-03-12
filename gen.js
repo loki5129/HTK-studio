@@ -11,10 +11,7 @@ export function score(play,weights,eroded,piece){
 // score = − (Landing height) + (Eroded piece cells) − (Row transitions)− (Column transitions) − 4 × (Holes) − (Cumulative wells)
 	
 	let nums = mathFunctions.mathness(play,piece);
-	//console.log("PIECEE: "+piece)
-	//console.log("NUMDERS: "+nums)
-	//console.log("erored: "+ eroded)
-	//console.log("WEIGHTS: "+ weights);
+
 	return(
 	(nums[0] * weights[0]) + // total height -
 	(nums[1] * weights[1]) + // complete lines +
@@ -30,16 +27,12 @@ export function score(play,weights,eroded,piece){
 
 
 function generateGaussian(mean,std){
-  var _2PI = Math.PI * 2;
-  var value;
-  
-  var u1 = Math.random();
-  var u2 = Math.random();
-  var z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(_2PI * u2);
-  var z1 = Math.sqrt(-2.0 * Math.log(u1)) * Math.sin(_2PI * u2);
-  value = z0 * std +mean;
+  const u1 = Math.random();
+    const u2 = Math.random();
+    const z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(Math.PI * 2 * u2);
+    return z0 * std + mean;
    
-   return value;
+  
   }
 function genWeights(){
 let induvial = [
@@ -50,80 +43,118 @@ generateGaussian(-1,1), // bumpiness
 generateGaussian(-1, 1), // row transitions
 generateGaussian(-1, 1), // col transitions
 generateGaussian(-1, 1), // Cumulative welss
-generateGaussian(-1, 1),  //erorded
-generateGaussian(1,1) // landing height/
+generateGaussian(-1, 1),  //landing heifhts
+generateGaussian(1,1)  // eroded
 ];
 	//console.log(induvial)
 	return induvial;
 }
 function genPop(N){
-	let population = [];
-	for (let i=0; i< N; i++){
-	const induvial = {weights:genWeights(),fitness: 0}
-	population.push(induvial);
+    return Array.from({ length: N }, () => ({ weights: genWeights(), fitness: 0 }));
+}
+class Workers{
+	constructor(path,size){
+	this.workers = Array.from({length:size},() => ({
+		worker : new Worker(path),
+		busy : false
+		}))
+	this.queue = []
 	}
-	return population
-}
-
-
-
-async function evalPop(population){
-	const numWorkers = os.cpus().length;
-	const chunkSize = Math.ceil(population.length / numWorkers);
-    	const chunks = [];
-	for (let i = 0; i < population.length; i += chunkSize) {
-        chunks.push(
-            population.slice(i, i + chunkSize)
-                .map((ind, idx) => ({
-                    weights: ind.weights,
-                    index: i + idx
-                }))
-        );
+    _dispatch(chunk){
+        return   new Promise((resolve, reject) => {
+	const task = {chunk,resolve,reject};
+	const slot = this.workers.find(w => !w.busy);
+	if (slot){
+		this._run(slot,task)
+	}else{
+	this.queue.push(task);
+		}
+    	});
     }
-    const promises = chunks.map(chunk =>
-        new Promise((resolve, reject) => {
-	const worker = new Worker("./workers.js",{
-	workerData: chunk
-	});
-	worker.on('message', resolve);
-            worker.on('error', reject);
-            worker.on('exit', code => {
-                if (code !== 0)
-                reject(new Error(`Worker exited with code ${code}`))
-		})}))
-	const results = await Promise.all(promises);
-	results.flat().forEach(r => {
-        population[r.index].fitness = r.fitness;
-    });
-}
+    _run(slot,task){
+	slot.busy = true
+	const onMessage = result =>{
+		slot.worker.removeListener('error',onError);
+		slot.busy = false;
+		task.resolve(result);
+		if (this.queue.length>0){
+			this._run(slot,this.queue.shift())
+			}
 
-
-
-
-function mutate(weights, mutationRate = 0.3, mutationStd = 1.5, generation=1) {
-    // weights: array of floats
-    // mutationRate: chance each weight mutates
-    // mutationStd: standard deviation of change
-    const decay = .97
-    const effectiveStd = mutationStd * Math.pow(decay, generation);
-    const newWeights = weights.map(w => {
-        if (Math.random() < mutationRate) {
-            // add small Gaussian noise
-            const change = generateGaussian(0, effectiveStd);
-            return w + change;
-        } else {
-            return w; // no change
+		}
+	const onError = err => {
+        slot.worker.removeListener('message', onMessage);
+        slot.busy = false;
+        task.reject(err);
+        if (this.queue.length > 0) {
+            this._run(slot, this.queue.shift());
         }
-    });
-    
-    return newWeights;
+    };
+	
+
+    slot.worker.once('message', onMessage);
+    slot.worker.once('error', onError);
+    slot.worker.postMessage(task.chunk);
+	}
+    async evaluate(population) {
+        // Only evaluate individuals with fitness === 0 (new/mutated children).
+        // Elites already have known fitness — skip them entirely.
+        const toEval = population
+            .map((ind, index) => ({ ind, index }))
+            .filter(({ ind }) => ind.fitness === 0);
+
+        if (toEval.length === 0) return;
+
+        const numWorkers = this.workers.length;
+        const chunkSize = Math.ceil(toEval.length / numWorkers);
+        const chunks = [];
+        for (let i = 0; i < toEval.length; i += chunkSize) {
+            chunks.push(
+                toEval.slice(i, i + chunkSize).map(({ ind, index }) => ({
+                    weights: ind.weights,
+                    index,
+                }))
+            );
+        }
+
+        const results = await Promise.all(chunks.map(c => this._dispatch(c)));
+        results.flat().forEach(r => {
+            population[r.index].fitness = r.fitness;
+        });
+    }
+
+    terminate() {
+        this.workers.forEach(({ worker }) => worker.terminate());
+    }
 }
-function crossover(parent1, parent2 ){
-    return parent1.map((w, i) => 
-   	Math.random()< 0.5 ? w : parent2[i] 
-    );
+
+
+
+
+
+
+
+
+
+
+
+function mutate(weights, mutationRate, mutationStd){
+    return weights.map(w => 
+    Math.random() < mutationRate
+    ? w +generateGaussian(0,mutationStd)
+    : w
+    )
 }
-function selction(pop, k =3){
+function crossover(parent1, parent2, alpha = 0.3){
+   return parent1.map(( a , i )=> {
+	const b = parent2[i];
+	const lo = Math.min(a,b) -alpha * Math.abs(a-b);
+	const hi = Math.max(a,b) + alpha * Math.abs(a - b);
+	return lo + Math.random() * (hi - lo);
+	});
+	 
+}
+function selction(pop, k){
 	let best = null;
 	for (let i = 0; i < k; i++) {
 const ind = pop[Math.floor(Math.random() * pop.length)];
@@ -133,10 +164,10 @@ const ind = pop[Math.floor(Math.random() * pop.length)];
 	}
 	return best
 }
-function injectRandom(pop, fraction = .1){
+function injectRandom(pop, fraction,eliteCount){
 	 const numToInject = Math.floor(pop.length * fraction)
 	for (let i =0;i<numToInject;i++){
-	const idx = Math.floor(Math.random() * pop.length);
+const idx = eliteCount+ Math.floor(Math.random() * (pop.length-eliteCount));
         pop[idx] = {weights: genWeights(),fitness: 0}}}
 
 const ISLAND_COUNT = 4;
@@ -173,66 +204,71 @@ function migrateIslands(islands) {
 
 
 export async function runGA(N,generations){
-	let topgen = [];
-	let population = genPop(N);
- 	await evalPop(population)	
-const bar = new cliProgress.SingleBar({
-	format:'Gen {value}/{total} |{bar}| Best: {best} Avg:{avg}'
+	const pool = new Workers('./workers.js',os.cpus().length)
+	let hall = []
+
+	const islandSize = Math.floor(N/ISLAND_COUNT)
+let islands = Array.from({length:ISLAND_COUNT},()=>genPop(islandSize))
+	for (const island of islands) await pool.evaluate(island);
+	const bar = new cliProgress.SingleBar({
+	format:'Gen {value}/{total} |{bar}| Best: {best} Avg:{avg} hof: {hof}'
 	}, cliProgress.Presets.shades_classic);
  
-    bar.start(generations, 0,{best: 0,avg: 0});
+    bar.start(generations, 0,{best: 0,avg: 0,hof:0});
 
-
-    let islands = splitIntoIslands(population,ISLAND_COUNT);
 
 
 for (let g =0; g <generations; g++){
-if (g > 0 && g % MIGRATION_INTERVAL === 0) {
+
+	if (g > 0 && g % MIGRATION_INTERVAL === 0) {
             migrateIslands(islands);
         }
- 	const newIslands = islands.map(island => {
+
+
+	const mstd  = 1.5 * Math.pow(0.995,g);
+	const mrate = Math.max(0.1,0.4-g*0.001);
+	const k     = Math.min(3+Math.floor((g/10),20))
+ 	islands = islands.map(island => {
 const sorted = [...island].sort((a, b) => b.fitness - a.fitness);
-const eliteCount = Math.max(1, Math.floor(island.length * 0.05));
+const eliteCount = Math.max(1, Math.floor(island.length * 0.1));
         const newIsland = sorted.slice(0, eliteCount).map(e => ({
                 weights: [...e.weights], fitness: e.fitness
             }));
 	  while (newIsland.length < island.length) {
-                const p1 = selction(island);
-                const p2 = selction(island);
-                let childWeights = crossover(p1.weights, p2.weights);
-                childWeights = mutate(childWeights, 0.3, 1.5, g);
-                newIsland.push({ weights: childWeights, fitness: 0 });
+                const p1 = selction(island,k);
+                const p2 = selction(island,k);
+                newIsland.push({ 
+		weights: mutate(crossover(p1.weights,p2.weights),mrate,mstd), 
+		fitness: 0 
+		});
             }
 
-            if (g > 10) injectRandom(newIsland, 0.1);
+            if (g > 10) injectRandom(newIsland, 0.08,eliteCount);
             return newIsland;
         });
-
-	islands = newIslands;
-        population = mergeIslands(islands);   // flatten for eval
-        await evalPop(population);
-        islands = splitIntoIslands(population, ISLAND_COUNT)
-const sorted = [...population].sort((a, b) => b.fitness - a.fitness);
-        const eliteCount = Math.floor(N * 0.05);
-        topgen.push(...sorted.slice(0, eliteCount).map(e => ({
-            weights: [...e.weights], fitness: e.fitness
-        })));
-	const best = sorted[0];
-        const avgFitness = population.reduce((sum, ind) => sum + ind.fitness, 0) / N;
+	for (const island of islands) await pool.evaluate(island);
+	const allInd = islands.flat();
+	hall.push(...allInd.filter(ind => ind.fitness > 0));
+	hall.sort((a,b) => b.fitness - a.fitness)
+	hall = hall.slice(0,20)
+	const best = hall[0]
+        const avg=allInd.reduce((sum, ind) => sum + ind.fitness, 0) / allInd.length;
 	bar.update(g + 1, {
-            best: best.fitness.toFixed(2),
-            avg: avgFitness.toFixed(2)
+            best: best?.fitness.toFixed(1) ?? 0,
+            avg: avg.toFixed(1),
+	    Hof: hall[0]?.fitness.toFixed(1) ?? 0.
         });	
 
 
 }	
 
 bar.stop()
-const jsonString = JSON.stringify(topgen, null, 2);
+pool.terminate()
+const jsonString = JSON.stringify(hall, null, 2);
 fs.writeFileSync("fitness.json", jsonString);
 
 console.log("Array saved to topFitness.json");
-return population
+return islands.flat()
 }
 
 
