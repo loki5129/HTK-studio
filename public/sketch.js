@@ -143,6 +143,7 @@ function showGameOver() {
 }
 
 function place() {
+  canhold = true;
   for (let row = 0; row < tetromino.matrix.length; row++) {
     for (let col = 0; col < tetromino.matrix[row].length; col++) {
       if (tetromino.matrix[row][col]) {
@@ -165,7 +166,12 @@ function place() {
       row++;
     }
   }
-
+ 
+   sendPlayfield(playfield, tetromino,hpiece,previewQueue[0]).then(data => {
+  if (data.move !== undefined) {
+    makeMove(data.move, tetromino,data.swap);
+  }
+}); 
   let points = 0;
   if (cleared === 1) points = 100;
   else if (cleared === 2) points = 300;
@@ -254,17 +260,34 @@ for (let i = 0; i < vis; i++) {
 
 let tetromino = null;
 
-async function sendPlayfield(play, piece, next) {
+async function sendPlayfield(play, piece,held, next) {
   const res = await fetch("/analyze", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ playfield: play, piece: piece, next: next })
+    body: JSON.stringify(
+   { playfield: play, 
+     piece: piece, 
+     next: {
+            name: next,
+            matrix: tetrominos[next].map(r => [...r]),
+            row: 0,
+            col: 0
+        }, 
+      held: {
+            name: held,
+            matrix: tetrominos[held].map(r => [...r]),
+            row: 0,
+            col: 0
+        }})
   });
   const text = await res.json();
   return text;
 }
 
-function makeMove(move, piece) {
+function makeMove(move, piece, swap) {
+  if (swap){
+    Hold()
+  }
   let col = move.col;
   let r = move.rotation;
   for (let s = 0; s < r; s++) {
@@ -276,7 +299,7 @@ function makeMove(move, piece) {
   while (col < piece.col && canmove(piece.matrix, piece.row, piece.col - 1)) {
     piece.col--;
   }
-  while (col > piece.col && canmove(piece.matrix, piece.row, piece.col - 1)) {
+  while (col > piece.col && canmove(piece.matrix, piece.row, piece.col + 1)) {
     piece.col++;
   }
 }
@@ -289,7 +312,7 @@ let dropI = 800;
 
 let clearAnim = null;
 let comboAnim = null;
-
+let fristpiece = true;
 function showClearText(cleared, currentCombo) {
   const labels = { 1: 'SINGLE', 2: 'DOUBLE', 3: 'TRIPLE', 4: 'TETRIS!' };
   const colorsMap = { 1: '#ffffff', 2: '#00ff66', 3: '#ff8800', 4: '#00ffff' };
@@ -379,6 +402,39 @@ function updatePreview() {
   }
 }
 
+
+
+
+var hpiece = "";
+var canhold = true;
+
+function drawHold() {
+    const canvas = document.getElementById('hold-model');
+    if (canvas) drawMiniPiece(canvas, hpiece);
+}
+
+
+function Hold() {
+    if (hpiece === '' && canhold) {
+        hpiece = tetromino.name;
+        tetromino = nextpiece();
+        reset();
+        canhold = false;
+        drawHold();
+    } else if (canhold) {
+        var temp = tetromino.name;
+        tetromino = {
+            name: hpiece,
+            matrix: tetrominos[hpiece].map(r => [...r]),
+            row: 0,
+            col: 0
+        };
+        reset();
+        hpiece = temp;
+        canhold = false;
+        drawHold();
+    }}
+
 function gameloop() {
   rf = requestAnimationFrame(gameloop);
   if (!paused && !gameover) {
@@ -386,7 +442,10 @@ function gameloop() {
     const deltaTime = currentT - lastTime;
     lastTime = currentT;
     dropCount += deltaTime;
-
+    if (fristpiece){
+      Hold();
+      fristpiece = false;
+    }
     const newLevel = Math.floor(lines / 10) + 1;
     if (newLevel !== level) {
         level = newLevel;
