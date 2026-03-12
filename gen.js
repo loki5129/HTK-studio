@@ -170,7 +170,7 @@ function injectRandom(pop, fraction,eliteCount){
 const idx = eliteCount+ Math.floor(Math.random() * (pop.length-eliteCount));
         pop[idx] = {weights: genWeights(),fitness: 0}}}
 
-const ISLAND_COUNT = 4;
+const ISLAND_COUNT = 2;
 const MIGRATION_INTERVAL = 10
 
 function splitIntoIslands(population, count) {
@@ -248,11 +248,16 @@ const eliteCount = Math.max(1, Math.floor(island.length * 0.1));
         });
 	for (const island of islands) await pool.evaluate(island);
 	const allInd = islands.flat();
-	hall.push(...allInd.filter(ind => ind.fitness > 0));
+	hall.push(...allInd.filter(ind => ind.fitness !== 0));
 	hall.sort((a,b) => b.fitness - a.fitness)
 	hall = hall.slice(0,20)
 	const best = hall[0]
         const avg=allInd.reduce((sum, ind) => sum + ind.fitness, 0) / allInd.length;
+	fs.writeFileSync(`checkpoint_gen${g}.json`, JSON.stringify({
+    generation: g,
+    best: hall[0],
+    population
+}));
 	bar.update(g + 1, {
             best: best?.fitness.toFixed(1) ?? 0,
             avg: avg.toFixed(1),
