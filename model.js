@@ -3,7 +3,8 @@ import * as pos from "./pos.js";
 export function bestMove(play, piece,next,held,weights){
 	let moves = pos.allPos(play, piece ,weights);
 	const heldPiece = (held && held.matrix) ? held : null;
-	let hmoves = heldPiece ? pos.allPos(play,heldpiece,weights) : [];
+	//console.log("HELD P: " +heldPiece)
+	let hmoves = heldPiece ? pos.allPos(play,heldPiece,weights) : [];
 	//console.log("piece: "+piece.name)
 	let bestobj = null;
 	let hobj = null
@@ -12,17 +13,19 @@ export function bestMove(play, piece,next,held,weights){
 	let scoreh = -Infinity
 	for (const move of moves){
 	const boardAM = pos.placeMove(play,piece,move)
-	if (!boardAM) break;
+	if (!boardAM) continue;
 	const nextMove = pos.allPos(boardAM.board, next, weights)
 	const nextBest = nextMove.length > 0 ? Math.max(...nextMove.map(m => m.score)) : 0;
 	const total = move.score + nextBest;
 	if (total > score){score = total; bestobj = move;}
 	}
-	for (const move in hmoves){
+	
+	for (const move of hmoves){
+    //console.log("MOVE: " + move)
 	const boardAMH = pos.placeMove(play,heldPiece,move);
-	if (!boardAMH) break;
-	const nextmoveh = pos.allPos(boardAMH.board,next,weights);
-	const nextbesth = nextMoveh.lenghth > 0 ? Math.max(...nextMoveh.map(m=> m.score)) : 0;
+	if (!boardAMH) continue;
+	const nextMoveh = pos.allPos(boardAMH.board,next,weights);
+	const nextbesth = nextMoveh.length > 0 ? Math.max(...nextMoveh.map(m=> m.score)) : 0;
 	const totalh = move.score + nextbesth;
 	if (totalh > scoreh){scoreh = totalh; hobj = move}
 	}
