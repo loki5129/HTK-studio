@@ -50,12 +50,22 @@ function nextpiece() {
   const matrix = tetrominos[name];
   const col = playfield[0].length / 2 - Math.ceil(matrix[0].length / 2);
   const row = 0;
-  return {
+  const piece = {
     name: name,
     matrix: matrix,
     row: row,
-    col: col
+    col: 0
   };
+  tetromino = piece
+  sendPlayfield(playfield, piece, hpiece, previewQueue[0]).then(data => {
+    if (data.move !== undefined) {
+	console.log("SERVER RESPONSE:", JSON.stringify(data));
+      const move = data.move.move;
+        const swap = data.move.swap && canhold; 
+	makeMove(move, piece, swap);
+    }
+  });
+  return piece
 }
 
 function canmove(matrix, cellRow, cellCol) {
@@ -167,11 +177,7 @@ function place() {
     }
   }
  
-   sendPlayfield(playfield, tetromino,hpiece,previewQueue[0]).then(data => {
-  if (data.move !== undefined) {
-    makeMove(data.move, tetromino,data.swap);
-  }
-}); 
+
   let points = 0;
   if (cleared === 1) points = 100;
   else if (cleared === 2) points = 300;
@@ -285,23 +291,33 @@ async function sendPlayfield(play, piece,held, next) {
 }
 
 function makeMove(move, piece, swap) {
-  if (swap){
+//console.log("if a tree falls in a forrest do you eat") 
+// console.log("makeMove called", move, swap);
+  //console.log("tetromino at time of makeMove:", tetromino);
+
+if (swap){
     Hold()
+    makeMove(move,tetromino,false)
+    return
   }
-  let col = move.col;
-  let r = move.rotation;
+    let r = move.rotation ;
   for (let s = 0; s < r; s++) {
-    const rotated = rotate(piece.matrix);
-    if (canmove(rotated, piece.row, piece.col)) {
-      piece.matrix = rotated;
+    const rotated = rotate(tetromino.matrix);
+    if (canmove(rotated, tetromino.row, tetromino.col)) {
+      tetromino.matrix = rotated;
     }
   }
-  while (col < piece.col && canmove(piece.matrix, piece.row, piece.col - 1)) {
-    piece.col--;
+
+  const tcol = move.col 
+
+if (canmove(tetromino.matrix, tetromino.row, tcol)) {
+    tetromino.col = tcol;
   }
-  while (col > piece.col && canmove(piece.matrix, piece.row, piece.col + 1)) {
-    piece.col++;
+
+  while (canmove(tetromino.matrix, tetromino.row + 1, tetromino.col)) {
+    tetromino.row++;
   }
+  place()
 }
 
 let level = 1;

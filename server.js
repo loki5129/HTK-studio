@@ -53,28 +53,14 @@ app.post("/analyze", (req, res) => {
  const playfield = req.body.playfield;
  const piece = req.body.piece;
  const next = req.body.next;
- //const held = req.body.held
- // console.log(playfield);
+ const held = req.body.held
+ //console.log(playfield);
  //console.log(piece); 
- //console.log(next);
- let weights = [
-      -1.197797829039768,
-      0.6474174876891019,
-      -2.8833479949250598,
-      -2.5218869939922164,
-      -0.4607524621395642,
-      -1.63969073716738,
-      -1.5347502364529162,
-      -0.8560507883771952,
-      -0.5
-    ]
- let  m = mathness(playfield)
- //console.log("holes: " + m[2])
- //let move = bestMove(playfield,piece,next,held,weights)
-   //console.log(typeof(piece))
-  //console.log(piece.length)
-  
- //console.log(move);
+// console.log(next);
+// console.log("HELD: " + held);
+ let weights = [-1.534542275492241,-0.1810270811186694,-1.883547189496421,-1.6653263509784657,-2.1990536788071235,-0.05579037469711157,-1.9657876795884994,-0.4184791626429063,1.5193199309116134]
+  let move = bestMove(playfield,piece,next,held,weights)
+ //console.log(move); 
  res.json({move})
 
 });
