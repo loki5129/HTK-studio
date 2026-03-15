@@ -21,7 +21,7 @@ Frontend:
 <li>JavaScript– Game interaction</li>
 <br>
 Backend:
-<li>Node.js– Server runtime</li>
+<li>Node.js– Server</li>
 <li>Custom game logic– Tetromino mechanics, scoring, AI</li>
 <li>Genetic algorithm– Used to train AI </li>
 
