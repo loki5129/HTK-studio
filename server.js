@@ -1,8 +1,7 @@
 import express from "express"
-import {bestMove} from "./model.js"
-import {runGA} from "./gen.js"
-import {runGame} from "./engine.js"
-import {mathness} from "./math.js"
+import {bestMove} from "./src/model.js"
+import {runGA} from "./src/gen.js"
+
 const app = express();
 
 app.use((req, res, next) => {
@@ -13,22 +12,13 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.static("public"));
+
+app.use(express.static("frontend"));
 app.use(express.json());
 
 app.post('/runGA', async (req, res) => {
     const { popSize = 50, generations = 20 } = req.body;
-    console.log(runGame([
-      -1.197797829039768,
-      0.6474174876891019,
-      -2.8833479949250598,
-      -2.5218869939922164,
-      -0.4607524621395642,
-      -1.63969073716738,
-      -1.5347502364529162,
-      -0.8560507883771952,
-      -0.822222222222222
-]));
+
      console.log(`Running GA with popSize=${popSize}, generations=${generations}`);
 
     try {

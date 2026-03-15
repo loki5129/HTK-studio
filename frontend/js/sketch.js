@@ -428,13 +428,16 @@ function drawHold() {
     const canvas = document.getElementById('hold-model');
     if (canvas) drawMiniPiece(canvas, hpiece);
 }
-
+function reset() {
+  tetromino.row = 0;
+  tetromino.col = playfield[0].length / 2 - Math.ceil(tetromino.matrix[0].length / 2);
+}
 
 function Hold() {
     if (hpiece === '' && canhold) {
         hpiece = tetromino.name;
         tetromino = nextpiece();
-        reset();
+        reset()
         canhold = false;
         drawHold();
     } else if (canhold) {
@@ -445,7 +448,7 @@ function Hold() {
             row: 0,
             col: 0
         };
-        reset();
+        reset()
         hpiece = temp;
         canhold = false;
         drawHold();

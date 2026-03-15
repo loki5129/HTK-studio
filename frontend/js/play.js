@@ -72,6 +72,7 @@ function genSp() {
 }
 
 function nextpiecep() {
+  
   initializePreviewp();
   const name = previewQueuep.shift();
   refillBagIfNeededp();
@@ -292,7 +293,7 @@ function updatePreviewp() {
   }
 }
 
-function reset() {
+function resetp() {
   tetrominop.row = 0;
   tetrominop.col = playfieldp[0].length / 2 - Math.ceil(tetrominop.matrix[0].length / 2);
 }
@@ -309,7 +310,7 @@ function playerHold() {
     if (hpiecep === '' && canholdp) {
         hpiecep = tetrominop.name;
         tetrominop = nextpiecep();
-        reset();
+        resetp();
         canholdp = false;
         drawHoldp();
     } else if (canholdp) {
@@ -320,7 +321,7 @@ function playerHold() {
             row: 0,
             col: 0
         };
-        reset();
+        resetp();
         hpiecep = temp;
         canholdp = false;
         drawHoldp();
