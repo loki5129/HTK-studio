@@ -1,7 +1,7 @@
 # HTK-studio
 
 ## Machine Learning Tetris
-Theme- Old is Gold
+Theme- Old is Gold<br>
 Team members- Thomas, Himika, Kamile
 
 <p>The Machine Learned Tetris Game Server is a server‑based implementation of the classic Tetris game, enhanced with a machine learning (ML) opponent. This system manages game logic, communicates with a client interface, and enables users to play against either the system or an AI-driven Tetris player</p>
