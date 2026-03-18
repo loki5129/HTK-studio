@@ -21,7 +21,7 @@ Frontend:
 <li>JavaScript– Game interaction</li>
 <br>
 Backend:
-<li>Node.js– Server runtime</li>
+<li>Node.js– Server</li>
 <li>Custom game logic– Tetromino mechanics, scoring, AI</li>
 <li>Genetic algorithm– Used to train AI </li>
 
@@ -38,4 +38,9 @@ Software:
 <li>JavaScript, HTML, CSS</li>
 <li>Node.js</li>
 <li>GitHub for version control</li>
+
+## Setup instructions:
+git clone https://github.com/loki5129/HTK-studio<br>
+cd HTK-studio<br>
+npm install<br>
 
