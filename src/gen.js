@@ -3,6 +3,8 @@ import { runGame } from './engine.js';
 import fs from "fs"
 import cliProgress from 'cli-progress';
 import os from "os"
+import { fileURLToPath } from 'url';
+import path from 'path';
 import { Worker } from 'worker_threads';
 export function score(play,weights,eroded,piece){
 //score = -w * height + s * complete lines - n * holes - j * bumpiness
@@ -52,6 +54,8 @@ generateGaussian(1,1)  // eroded
 function genPop(N){
     return Array.from({ length: N }, () => ({ weights: genWeights(), fitness: 0 }));
 }
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 class Workers{
 	constructor(path,size){
 	this.workers = Array.from({length:size},() => ({
@@ -204,8 +208,7 @@ function migrateIslands(islands) {
 
 
 export async function runGA(N,generations){
-	const pool = new Workers('./workers.js',os.cpus().length)
-	let hall = []
+const pool = new Workers(path.join(__dirname, 'workers.js'), os.cpus().length)	let hall = []
 
 	const islandSize = Math.floor(N/ISLAND_COUNT)
 let islands = Array.from({length:ISLAND_COUNT},()=>genPop(islandSize))
