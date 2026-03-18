@@ -3,7 +3,7 @@ import {bestMove} from "./model.js";
 
 
 
-
+const MAXPIECE = 500;
 function randint(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -218,10 +218,11 @@ export function runGame(weights){
        initPlayfield();
     let linesobj = {lines:0,score:0};
     let gameover = false;
-    
+    let piececount =0; 
     let state = {hpiece: "",canhold:true}
-      while (!gameover ) {
+      while (!gameover && piececount!=MAXPIECE) {
 	let piece = nextpiece();
+	piececount++
 	state.canhold = true
 	if (state.hpiece === ""){
 		({piece,state} =Hold(piece,state))
