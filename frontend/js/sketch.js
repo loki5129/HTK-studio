@@ -294,7 +294,7 @@ function makeMove(move, piece, swap) {
 //console.log("if a tree falls in a forrest do you eat") 
 // console.log("makeMove called", move, swap);
   //console.log("tetromino at time of makeMove:", tetromino);
-
+if (!paused){
 if (swap){
     Hold()
     makeMove(move,tetromino,false)
@@ -317,7 +317,7 @@ if (canmove(tetromino.matrix, tetromino.row, tcol)) {
   while (canmove(tetromino.matrix, tetromino.row + 1, tetromino.col)) {
     tetromino.row++;
   }
-  place()
+  place()}
 }
 
 let level = 1;
@@ -436,9 +436,10 @@ function reset() {
 function Hold() {
     if (hpiece === '' && canhold) {
         hpiece = tetromino.name;
-        tetromino = nextpiece();
+        
+	tetromino = nextpiece();
         reset()
-        canhold = false;
+	canhold = false;
         drawHold();
     } else if (canhold) {
         var temp = tetromino.name;
@@ -448,9 +449,10 @@ function Hold() {
             row: 0,
             col: 0
         };
-        reset()
+        reset() 
         hpiece = temp;
         canhold = false;
+	
         drawHold();
     }}
 
