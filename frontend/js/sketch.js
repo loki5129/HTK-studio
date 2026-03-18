@@ -59,7 +59,7 @@ function nextpiece() {
   tetromino = piece
   sendPlayfield(playfield, piece, hpiece, previewQueue[0]).then(data => {
     if (data.move !== undefined) {
-	console.log("SERVER RESPONSE:", JSON.stringify(data));
+	//console.log("SERVER RESPONSE:", JSON.stringify(data));
       const move = data.move.move;
         const swap = data.move.swap && canhold; 
 	makeMove(move, piece, swap);
