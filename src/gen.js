@@ -208,7 +208,8 @@ function migrateIslands(islands) {
 
 
 export async function runGA(N,generations){
-const pool = new Workers(path.join(__dirname, 'workers.js'), os.cpus().length)	let hall = []
+const pool = new Workers(path.join(__dirname, 'workers.js'), os.cpus().length);
+	let hall = []
 
 	const islandSize = Math.floor(N/ISLAND_COUNT)
 let islands = Array.from({length:ISLAND_COUNT},()=>genPop(islandSize))
