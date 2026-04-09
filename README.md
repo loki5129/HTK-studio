@@ -41,7 +41,7 @@ Software:
 
 ## Setup instructions:
 ```bash
-git clone https://github.com/loki5129/HTK-studio<br>
-cd HTK-studio<br>
-npm install<br>
+git clone https://github.com/loki5129/HTK-studio
+cd HTK-studio
+npm install
 ```
