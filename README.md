@@ -40,7 +40,9 @@ Software:
 <li>GitHub for version control</li>
 
 ## Setup instructions:
+```bash
 git clone https://github.com/loki5129/HTK-studio<br>
 cd HTK-studio<br>
+```
 npm install<br>
 
